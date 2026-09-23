@@ -585,6 +585,62 @@
             triggerServerSync(`9C-CHANGE-PASS`, `${currentUser}%3B${await sha512(pwd)}`, "Passwort erfolgreich geändert.", () => {});
         }
 
+        // --- Benutzerkonto über ?create anlegen ---
+        async function showCreateUser() {
+            const data = await Dialog.open({
+                title: 'Neuen Benutzer anlegen',
+                fields: [
+                    { placeholder: 'Wunsch-Benutzername' },
+                    { placeholder: 'Passwort', type: 'password' }
+                ],
+                buttons: [
+                    { text: 'Abbrechen', action: 'cancel' },
+                    {
+                        text: 'Fortfahren',
+                        class: 'primary',
+                        action: async (dlg) => {
+                            const inputs = dlg.inputs.querySelectorAll('input');
+                            const username = inputs[0]?.value?.trim() || '';
+                            const password = inputs[1]?.value || '';
+
+                            if (!username || !password) {
+                                alert('Benutzername und Passwort sind Pflichtfelder!');
+                                return;
+                            }
+
+                            if (username.length < 2) {
+                                alert('Der Benutzername ist zu kurz!');
+                                return;
+                            }
+
+                            if (password.length < 3) {
+                                alert('Das Passwort muss mindestens 3 Zeichen lang sein!');
+                                return;
+                            }
+
+                            const uname = sanitizeHTML(username.toUpperCase());
+
+                            dlg.close();
+
+                            triggerServerSync(
+                                `9C-CREATE-USER`,
+                                `${uname}%3B${await sha512(password)}`,
+                                "Benutzerkonto wurde erfolgreich angelegt!",
+                                () => {
+                                    window.history.replaceState({}, document.title, window.location.pathname);
+                                    currentUser = uname;
+                                    setCookie('9c_user', uname, 7);
+                                    updateMenu();
+                                    loadLinks();
+                                    showToast(`Angemeldet als: ${formatUsername(uname)}`);
+                                }
+                            );
+                        }
+                    }
+                ]
+            });
+        }
+
         // --- Gist Links ---
         async function loadLinks() {
             const cont = document.getElementById('button-container'); cont.innerHTML = '';
