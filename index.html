@@ -2,176 +2,187 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>9C</title>
-    <!-- Favicon von GitHub -->
     <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Kleinlauch/9C/main/favicon.ico">
-    <!-- Quicksand Font -->
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-color: #0b0c10;
-            --glass-bg: rgba(255, 255, 255, 0.05);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --glass-hover: rgba(255, 255, 255, 0.12);
-            --accent: #4ade80;
-            --accent-glow: rgba(74, 222, 128, 0.4);
+            /* Giftgrün & Bunte Akzente */
+            --bg-dark: #070a08;
+            --glass-bg: rgba(20, 30, 20, 0.4);
+            --glass-border: rgba(57, 255, 20, 0.2);
+            --glass-hover: rgba(57, 255, 20, 0.15);
+            --accent: #39ff14; /* Giftgrün */
+            --accent-glow: rgba(57, 255, 20, 0.6);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
-            --danger: #ef4444;
-            --danger-glow: rgba(239, 68, 68, 0.4);
+            --danger: #ff0055;
+            --danger-glow: rgba(255, 0, 85, 0.6);
         }
+
+        /* Lite Mode Overrides */
+        body.lite-mode * {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            box-shadow: none !important;
+            transition: none !important;
+            animation: none !important;
+        }
+        body.lite-mode { background: #0a0a0a !important; }
+        body.lite-mode .glass-btn { background: #111; border: 1px solid #333; }
+        body.lite-mode .modal-overlay { background: rgba(0,0,0,0.9); }
 
         body {
-            margin: 0; padding: 0; min-height: 100vh;
-            background: radial-gradient(circle at top right, #1e1e2d, var(--bg-color)), 
-                        url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" opacity="0.05"%3E%3Ccircle cx="200" cy="200" r="150" fill="%234ade80" filter="blur(100px)"/%3E%3C/svg%3E') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Quicksand', sans-serif;
-            color: var(--text-main);
+            margin: 0; padding: 1.5rem; min-height: 100vh; width: 100vw;
+            background: radial-gradient(circle at top left, rgba(57, 255, 20, 0.05), transparent 40%),
+                        radial-gradient(circle at bottom right, rgba(0, 255, 255, 0.05), transparent 40%),
+                        var(--bg-dark);
+            background-size: cover; background-attachment: fixed;
+            font-family: 'Quicksand', sans-serif; color: var(--text-main);
             display: flex; flex-direction: column; align-items: center;
-            padding: 2rem; box-sizing: border-box;
-            user-select: none;
+            box-sizing: border-box; overflow-x: hidden; user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
+
+        /* Uhr (Nur Querformat) */
+        .clock-container {
+            display: none; font-size: 2.5rem; font-weight: 300; letter-spacing: 2px;
+            color: var(--accent); text-shadow: 0 0 15px var(--accent-glow); margin-bottom: 0.5rem;
+        }
+        .digit { display: inline-block; width: 1.2em; text-align: center; position: relative; height: 1em; overflow: hidden; }
+        .digit-inner { display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 
         h1.title {
-            font-size: 4rem; font-weight: 300; letter-spacing: 5px;
-            margin-bottom: 3rem; text-align: center;
-            text-shadow: 0 0 25px rgba(255,255,255,0.3);
+            font-size: 4.5rem; font-weight: 300; letter-spacing: 6px; margin: 0 0 3rem 0;
+            text-align: center; color: white; text-shadow: 0 0 20px rgba(255,255,255,0.4);
         }
 
-        /* Haupt-Button Raster */
+        /* Button Grid */
         #button-container {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem; width: 100%; max-width: 1000px;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 1.2rem; width: 100%; max-width: 1200px;
+        }
+        
+        @media (max-width: 600px) {
+            #button-container { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.8rem; }
+            h1.title { font-size: 3rem; margin-bottom: 2rem; }
+            body { padding: 1rem; }
+            .glass-btn { padding: 1rem !important; font-size: 1rem !important; }
         }
 
         .glass-btn {
-            background: var(--glass-bg); border: 1px solid var(--glass-border);
-            border-radius: 16px; padding: 1.5rem; color: var(--text-main);
-            font-size: 1.2rem; font-family: 'Quicksand', sans-serif; font-weight: 600;
-            cursor: pointer; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            position: relative; overflow: hidden; word-wrap: break-word;
-        }
-        .glass-btn::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-            transform: skewX(-25deg); transition: all 0.6s ease;
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 18px;
+            padding: 1.4rem; color: var(--text-main); font-size: 1.15rem; font-family: 'Quicksand', sans-serif;
+            font-weight: 600; cursor: pointer; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative; overflow: hidden; word-wrap: break-word; outline: none;
         }
         .glass-btn:hover:not(:disabled) {
-            background: var(--glass-hover); border-color: rgba(255, 255, 255, 0.25);
-            transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
+            background: var(--glass-hover); border-color: var(--accent); transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--accent-glow); color: var(--accent);
         }
-        .glass-btn:hover:not(:disabled)::before { left: 200%; }
-        .glass-btn:disabled {
-            background: rgba(255, 255, 255, 0.02); color: var(--text-muted); cursor: not-allowed;
-            border-color: rgba(255, 255, 255, 0.02); box-shadow: none;
-        }
+        .glass-btn:disabled { background: rgba(255,255,255,0.02); color: #555; cursor: not-allowed; border-color: transparent; box-shadow: none; }
 
-        /* Seitenmenü / Floating Action Menu */
-        .side-menu {
-            position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 100;
-        }
+        /* Floating Menu */
+        .side-menu { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
         .menu-item {
-            display: flex; align-items: center; background: rgba(20, 20, 25, 0.6);
-            border: 1px solid var(--glass-border); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            padding: 12px; border-radius: 16px; cursor: pointer; color: white;
-            transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            display: flex; align-items: center; background: rgba(10, 15, 10, 0.8);
+            border: 1px solid var(--glass-border); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            padding: 12px; border-radius: 16px; cursor: pointer; color: white; transition: 0.3s;
         }
-        .menu-item svg { width: 24px; height: 24px; flex-shrink: 0; }
-        .menu-item span { display: none; margin-left: 12px; font-weight: 600; font-size: 1rem; white-space: nowrap; }
+        .menu-item svg { width: 22px; height: 22px; flex-shrink: 0; }
+        .menu-item span { display: none; margin-left: 10px; font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
         .menu-item:hover { background: var(--glass-hover); border-color: var(--accent); color: var(--accent); }
         .menu-item.danger:hover { border-color: var(--danger); color: var(--danger); }
-        
-        @media (min-width: 768px) and (orientation: landscape) {
+
+        @media (orientation: landscape) {
+            .clock-container { display: flex; justify-content: center; align-items: center; }
             .menu-item span { display: inline; }
-            .menu-item { padding: 12px 20px 12px 12px; }
+            .menu-item { padding: 12px 18px 12px 12px; }
+        }
+        @media (orientation: portrait) {
+            .menu-item.logged-in span { display: inline; margin-left: 10px; }
+            .menu-item.logged-in { padding: 12px 18px 12px 12px; }
         }
 
-        /* Modals (Popups) */
+        /* Modals */
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             display: flex; justify-content: center; align-items: center; z-index: 1000;
-            opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 1rem; box-sizing: border-box;
+            opacity: 0; visibility: hidden; transition: 0.3s ease; padding: 1rem; box-sizing: border-box;
         }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        
         .modal-box {
-            background: rgba(25, 25, 32, 0.85); border: 1px solid var(--glass-border);
-            border-radius: 24px; padding: 2.5rem; width: 100%; max-width: 450px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);
-            transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center; max-height: 90vh; overflow-y: auto;
+            background: rgba(10, 15, 10, 0.9); border: 1px solid var(--glass-border); border-radius: 20px;
+            padding: 2rem; width: 100%; max-width: 420px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(57,255,20,0.1);
+            transform: translateY(20px) scale(0.95); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center;
         }
         .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
-        
-        .modal-box.editor-mode { max-width: 800px; text-align: left; }
-
+        .modal-box.editor-mode { max-width: 800px; text-align: left; max-height: 90vh; overflow-y: auto; }
         .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: white; }
-        .modal-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; color: var(--text-muted); }
-        
+        .modal-text { font-size: 1.1rem; line-height: 1.5; margin-bottom: 1.5rem; color: var(--text-muted); }
+
+        /* Input Fields & Eye Icon */
+        .input-wrapper { position: relative; width: 100%; margin-bottom: 1.2rem; }
         .modal-input {
-            width: 100%; padding: 15px 20px; margin-bottom: 1.5rem;
-            background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 14px;
-            color: white; font-size: 1.1rem; font-family: 'Quicksand', sans-serif;
-            box-sizing: border-box; outline: none; transition: 0.3s;
+            width: 100%; padding: 14px 45px 14px 16px; background: rgba(0,0,0,0.6);
+            border: 1px solid var(--glass-border); border-radius: 12px; color: white;
+            font-size: 1.1rem; font-family: 'Quicksand', sans-serif; box-sizing: border-box; outline: none; transition: 0.3s;
         }
         .modal-input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-        
-        .modal-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
-        .modal-actions.right { justify-content: flex-end; }
-        
-        .modal-btn {
-            background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;
-            padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 1.1rem;
-            font-family: 'Quicksand', sans-serif; font-weight: 600; transition: 0.2s;
+        .eye-icon {
+            position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer;
+            color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 5px;
         }
-        .modal-btn:hover { background: var(--glass-hover); }
+        .eye-icon:hover { color: var(--accent); }
+
+        .modal-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; flex-wrap: wrap; }
+        .modal-actions.right { justify-content: flex-end; }
+        .modal-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white;
+            padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 1.05rem;
+            font-family: 'Quicksand', sans-serif; font-weight: 600; transition: 0.2s; flex: 1; min-width: 120px;
+        }
+        .modal-btn:hover { background: rgba(255,255,255,0.1); }
         .modal-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
-        .modal-btn.primary:hover { background: #34d399; box-shadow: 0 0 25px var(--accent-glow); }
-        .modal-btn.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+        .modal-btn.primary:hover { background: #fff; box-shadow: 0 0 25px var(--accent-glow); }
+        .modal-btn.danger { background: rgba(255,0,85,0.1); color: var(--danger); border-color: var(--danger); }
         .modal-btn.danger:hover { background: var(--danger); color: white; box-shadow: 0 0 15px var(--danger-glow); }
 
         /* Editor Liste */
-        .editor-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+        .editor-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; }
         .editor-item { 
             display: flex; justify-content: space-between; align-items: center; 
-            background: rgba(0,0,0,0.3); padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.4); padding: 0.8rem 1.2rem; border-radius: 12px; border: 1px solid var(--glass-border);
         }
-        .editor-item span { font-weight: 600; font-size: 1.1rem; }
-        .editor-actions { display: flex; gap: 0.5rem; }
-        .icon-btn { 
-            background: transparent; border: none; color: var(--text-muted); cursor: pointer; 
-            padding: 8px; transition: 0.2s; border-radius: 8px;
-        }
-        .icon-btn:hover { background: var(--glass-bg); color: white; }
-        .icon-btn.delete:hover { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+        .editor-item span { font-weight: 600; font-size: 1rem; word-break: break-all; margin-right: 10px;}
+        .editor-actions { display: flex; gap: 0.5rem; flex-shrink: 0;}
+        .icon-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s;}
+        .icon-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .icon-btn.delete:hover { background: rgba(255,0,85,0.2); color: var(--danger); }
 
         /* Toast */
         .toast {
             position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            background: rgba(20,20,25,0.9); border: 1px solid var(--accent); color: white;
-            padding: 12px 24px; border-radius: 30px; font-weight: 600; box-shadow: 0 5px 20px var(--accent-glow);
-            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 2000;
+            background: rgba(10,15,10,0.95); border: 1px solid var(--accent); color: var(--accent);
+            padding: 12px 24px; border-radius: 30px; font-weight: 700; box-shadow: 0 5px 25px var(--accent-glow);
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 2000; text-align: center; white-space: nowrap;
         }
-        .toast.show { top: 30px; }
+        .toast.show { top: 20px; }
 
-        /* Loading Bar */
-        .loader-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000;
-            background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center;
-            opacity: 0; visibility: hidden; transition: 0.3s;
-        }
-        .loader-overlay.active { opacity: 1; visibility: visible; }
-        .loader-text { color: var(--accent); font-size: 1.5rem; font-weight: 600; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;}
-        .loader-bar-container { width: 300px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-        .loader-bar { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 15px var(--accent); transition: width 3s linear; }
+        /* Server Sync Animation (Windows XP Style) */
+        .sync-box { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
+        .sync-layout { display: flex; align-items: center; gap: 1rem; width: 100%; justify-content: space-between; }
+        .sync-icon { font-size: 3rem; text-shadow: 0 0 15px rgba(255,255,255,0.3); }
+        .xp-bar-container { flex-grow: 1; height: 14px; background: rgba(0,0,0,0.5); border: 2px solid var(--glass-border); border-radius: 8px; overflow: hidden; position: relative; }
+        .xp-bar { width: 30%; height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); border-radius: 6px; position: absolute; left: -30%; animation: xpBoot 1.5s infinite linear; }
+        @keyframes xpBoot { 0% { left: -30%; } 100% { left: 100%; } }
+        body.lite-mode .xp-bar { animation: none; width: 100%; left: 0; transition: 0.3s; }
 
-        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; }
+        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; font-weight: 600;}
     </style>
 </head>
 <body>
@@ -180,7 +191,7 @@
     <div class="side-menu" id="side-menu">
         <div class="menu-item" id="btn-user">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zM20 21a8 8 0 10-16 0"/></svg>
-            <span>Benutzer</span>
+            <span id="user-label">Benutzer</span>
         </div>
         <div class="menu-item" id="btn-edit" style="display: none;">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -196,10 +207,22 @@
         </div>
     </div>
 
+    <!-- Uhr -->
+    <div class="clock-container" id="clock">
+        <div class="digit" id="h1"><div class="digit-inner"><span>0</span><span>0</span></div></div>
+        <div class="digit" id="h2"><div class="digit-inner"><span>0</span><span>0</span></div></div>
+        :
+        <div class="digit" id="m1"><div class="digit-inner"><span>0</span><span>0</span></div></div>
+        <div class="digit" id="m2"><div class="digit-inner"><span>0</span><span>0</span></div></div>
+        :
+        <div class="digit" id="s1"><div class="digit-inner"><span>0</span><span>0</span></div></div>
+        <div class="digit" id="s2"><div class="digit-inner"><span>0</span><span>0</span></div></div>
+    </div>
+
     <h1 class="title">9C</h1>
     <div id="button-container"></div>
 
-    <!-- Universal Dialog -->
+    <!-- Dialog / Modals -->
     <div id="dialog-overlay" class="modal-overlay">
         <div class="modal-box" id="dialog-box">
             <div id="dialog-title" class="modal-title"></div>
@@ -209,68 +232,120 @@
         </div>
     </div>
 
-    <!-- Loading Bar -->
-    <div id="loader" class="loader-overlay">
-        <div class="loader-text">Übernehme Änderungen...</div>
-        <div class="loader-bar-container"><div class="loader-bar" id="loader-bar"></div></div>
+    <!-- Server Sync -->
+    <div id="sync-overlay" class="modal-overlay">
+        <div class="modal-box">
+            <div class="sync-box">
+                <div class="sync-layout">
+                    <div class="sync-icon">💻</div>
+                    <div class="xp-bar-container"><div class="xp-bar"></div></div>
+                    <div class="sync-icon">🗄️</div>
+                </div>
+                <div class="modal-text" style="margin:0; font-weight:600; color:var(--accent);">Daten werden an den Server geschickt...</div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // Rechtsklick blockieren
+        // Rechtsklick blockieren & Sicherheit
         document.addEventListener('contextmenu', e => e.preventDefault());
 
-        const GIST_LINKS = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw/command.txt";
-        const GIST_USERS = "https://gist.githubusercontent.com/Kleinlauch/6ccb29c799b9a8ef77998a16fec5dfbf/raw/command.txt";
+        const GIST_LINKS = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw";
+        const GIST_USERS = "https://gist.githubusercontent.com/Kleinlauch/6ccb29c799b9a8ef77998a16fec5dfbf/raw";
         const PUSHCUT_BASE = "https://api.pushcut.io/loPBXSU7lmRjUzDvwnMUm/execute?shortcut=";
 
         let currentUser = null;
         let linksData = [];
         let editorData = [];
         let isDirty = false;
+        let isLiteMode = false;
 
-        // Hilfsfunktionen
+        // --- Performance & Lite Mode Check ---
+        function enableLiteMode() {
+            isLiteMode = true;
+            document.body.classList.add('lite-mode');
+        }
+        
+        let frames = 0; let lastTime = performance.now();
+        let lagCheck = requestAnimationFrame(function check(time) {
+            frames++;
+            if(time - lastTime > 1000) {
+                if(frames < 25 && !isLiteMode) { // Bei <25 FPS in der ersten Sekunde
+                    Dialog.open({
+                        title: 'Langsame Verbindung / Gerät erkannt',
+                        text: 'Die Seite scheint langsam zu laden oder zu laggen.',
+                        buttons: [
+                            { text: 'Fortfahren', action: 'cancel' },
+                            { text: 'Lite Mode (Schneller)', class: 'primary', action: () => { enableLiteMode(); Dialog.close(); } }
+                        ]
+                    });
+                }
+                cancelAnimationFrame(lagCheck);
+            } else {
+                lagCheck = requestAnimationFrame(check);
+            }
+        });
+
+        // --- Hilfsfunktionen ---
         async function sha512(str) {
-            const buf = await crypto.subtle.digest("SHA-512", new TextEncoder("utf-8").encode(str));
-            return Array.prototype.map.call(new Uint8Array(buf), x=>(('00'+x.toString(16)).slice(-2))).join('');
+            const buf = await crypto.subtle.digest("SHA-512", new TextEncoder().encode(str));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
-
-        function setCookie(name, value, days) {
-            let expires = "";
-            if (days) {
-                let date = new Date();
-                date.setTime(date.getTime() + (days*24*60*60*1000));
-                expires = "; expires=" + date.toUTCString();
-            }
-            document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Strict";
-        }
-        function getCookie(name) {
-            let nameEQ = name + "=";
-            let ca = document.cookie.split(';');
-            for(let i=0;i < ca.length;i++) {
-                let c = ca[i];
-                while (c.charAt(0)==' ') c = c.substring(1,c.length);
-                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-            }
-            return null;
-        }
-        function deleteCookie(name) { document.cookie = name+'=; Max-Age=-99999999;'; }
+        const setCookie = (n, v, d) => document.cookie = `${n}=${v || ""}; max-age=${d*86400}; path=/; SameSite=Strict`;
+        const getCookie = n => document.cookie.split('; ').find(row => row.startsWith(n + '='))?.split('=')[1] || null;
+        const deleteCookie = n => document.cookie = `${n}=; max-age=0; path=/`;
+        
+        const formatUsername = name => name.toLowerCase().replace(/(?:^|\s)\w/g, m => m.toUpperCase());
+        const sanitizeHTML = str => str.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t]));
+        const sanitizeGistInput = str => sanitizeHTML(str.replace(/[;~\n\r]/g, ' ')).trim();
 
         function showToast(msg) {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            const t = document.getElementById('toast');
+            t.textContent = msg; t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 3000);
         }
 
-        function sanitizeHTML(str) {
-            return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
+        // --- Clock Logic ---
+        function updateClock() {
+            const d = new Date();
+            const timeStr = [d.getHours(), d.getMinutes(), d.getSeconds()].map(n => n.toString().padStart(2, '0')).join('');
+            const ids = ['h1','h2','m1','m2','s1','s2'];
+            ids.forEach((id, i) => {
+                const char = timeStr[i];
+                const el = document.getElementById(id);
+                const spans = el.querySelectorAll('span');
+                if (spans[0].textContent !== char) {
+                    spans[1].textContent = char;
+                    el.querySelector('.digit-inner').style.transform = 'translateY(-1em)';
+                    setTimeout(() => {
+                        spans[0].textContent = char;
+                        el.querySelector('.digit-inner').style.transition = 'none';
+                        el.querySelector('.digit-inner').style.transform = 'translateY(0)';
+                        setTimeout(() => el.querySelector('.digit-inner').style.transition = 'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)', 20);
+                    }, 400);
+                }
+            });
         }
-        // Verhindert, dass Formatierungszeichen (; oder ~ oder Zeilenumbrüche) ins Gist kommen
-        function sanitizeGistInput(str) {
-            return sanitizeHTML(str.replace(/[;~\n\r]/g, ' ')).trim();
+        setInterval(updateClock, 1000); updateClock();
+
+        // --- UI Updates ---
+        function updateMenu() {
+            document.getElementById('btn-edit').style.display = currentUser ? 'flex' : 'none';
+            document.getElementById('btn-signout').style.display = currentUser ? 'flex' : 'none';
+            document.getElementById('btn-admin').style.display = (currentUser === 'MARCO' || currentUser === 'LOCAL') ? 'flex' : 'none';
+            
+            const userBtn = document.getElementById('btn-user');
+            const userLabel = document.getElementById('user-label');
+            if (currentUser) {
+                userLabel.textContent = formatUsername(currentUser);
+                userBtn.classList.add('logged-in');
+            } else {
+                userLabel.textContent = 'Benutzer';
+                userBtn.classList.remove('logged-in');
+            }
         }
 
-        // Custom Dialog Manager (Ersatz für prompt, alert, confirm)
+        // --- Custom Dialog System ---
         const Dialog = {
             overlay: document.getElementById('dialog-overlay'),
             box: document.getElementById('dialog-box'),
@@ -295,17 +370,28 @@
                             if(f.label) {
                                 let l = document.createElement('label'); l.textContent = f.label; this.inputs.appendChild(l);
                             }
+                            let wrap = document.createElement('div'); wrap.className = 'input-wrapper';
                             let inp = document.createElement('input');
-                            inp.type = f.type || 'text';
-                            inp.className = 'modal-input';
-                            inp.placeholder = f.placeholder || '';
-                            inp.value = f.value || '';
-                            inp.id = 'dialog-inp-' + idx;
-                            if (idx === 0) setTimeout(() => inp.focus(), 100);
-                            inp.addEventListener('keydown', (e) => {
-                                if (e.key === 'Enter') this.submit(config.buttons);
+                            inp.type = f.type || 'text'; inp.className = 'modal-input';
+                            inp.placeholder = f.placeholder || ''; inp.value = f.value || '';
+                            
+                            inp.addEventListener('keypress', (e) => {
+                                if(e.key === 'Enter') { e.preventDefault(); this.submit(config.buttons); }
                             });
-                            this.inputs.appendChild(inp);
+                            
+                            wrap.appendChild(inp);
+
+                            if(f.type === 'password') {
+                                let eye = document.createElement('div'); eye.className = 'eye-icon';
+                                eye.innerHTML = `<svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+                                eye.onclick = () => {
+                                    inp.type = inp.type === 'password' ? 'text' : 'password';
+                                    eye.style.color = inp.type === 'text' ? 'var(--accent)' : 'var(--text-muted)';
+                                };
+                                wrap.appendChild(eye);
+                            }
+                            this.inputs.appendChild(wrap);
+                            if (idx === 0) setTimeout(() => inp.focus(), 50);
                         });
                     } else if (config.customHTML) {
                         this.inputs.innerHTML = config.customHTML;
@@ -320,57 +406,78 @@
                             this.actions.appendChild(btn);
                         });
                     }
-
                     this.overlay.classList.add('active');
                 });
             },
-            
             submit(buttons) {
-                const primaryBtn = buttons.find(b => b.class.includes('primary'));
-                if (primaryBtn) this.handleBtnClick(primaryBtn.action);
+                const primary = buttons.find(b => b.class && b.class.includes('primary')) || buttons[buttons.length-1];
+                if(primary) this.handleBtnClick(primary.action);
             },
-
             handleBtnClick(action) {
-                if (action === 'cancel') {
-                    this.close(null);
-                } else if (action === 'ok') {
-                    const inputs = this.inputs.querySelectorAll('input');
-                    if (inputs.length === 1) this.close(inputs[0].value);
-                    else if (inputs.length > 1) {
-                        let res = []; inputs.forEach(i => res.push(i.value)); this.close(res);
-                    } else this.close(true);
-                } else if (typeof action === 'function') {
-                    action(this);
-                }
+                if (action === 'cancel') this.close(null);
+                else if (action === 'ok') {
+                    const inps = Array.from(this.inputs.querySelectorAll('input'));
+                    if(inps.length === 1) this.close(inps[0].value);
+                    else if(inps.length > 1) this.close(inps.map(i => i.value));
+                    else this.close(true);
+                } else if (typeof action === 'function') action(this);
             },
-
             close(val) {
                 this.overlay.classList.remove('active');
-                setTimeout(() => { if (this.resolvePromise) this.resolvePromise(val); }, 300);
+                setTimeout(() => { if (this.resolvePromise) { this.resolvePromise(val); this.resolvePromise = null; } }, 300);
             }
         };
 
-        // UI Updates
-        function updateMenu() {
-            document.getElementById('btn-edit').style.display = currentUser ? 'flex' : 'none';
-            document.getElementById('btn-signout').style.display = currentUser ? 'flex' : 'none';
-            document.getElementById('btn-admin').style.display = (currentUser === 'MARCO' || currentUser === 'LOCAL') ? 'flex' : 'none';
+        // --- Server Sync UI (Loading Buffer) ---
+        const syncOverlay = document.getElementById('sync-overlay');
+        function showServerSync() { syncOverlay.classList.add('active'); }
+        function hideServerSync() { syncOverlay.classList.remove('active'); }
+
+        async function triggerServerSync(shortcut, payload, successCallback) {
+            showServerSync();
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
+                
+                await fetch(PUSHCUT_BASE + shortcut + "&input=" + payload, { mode: 'no-cors', signal: controller.signal });
+                clearTimeout(timeoutId);
+                
+                hideServerSync();
+                setTimeout(() => successCallback(), 400); // Wait for modal animation
+            } catch(e) {
+                hideServerSync();
+                setTimeout(() => {
+                    if (e.name === 'AbortError') {
+                        Dialog.open({ title: 'Fehler', text: 'Server Antwortet nicht!', buttons: [{text:'OK', class:'danger', action:'cancel'}] });
+                    } else {
+                        Dialog.open({ title: 'Fehler', text: 'Netzwerkfehler.', buttons: [{text:'OK', class:'danger', action:'cancel'}] });
+                    }
+                }, 400);
+            }
         }
 
-        // Init
+        // --- Init & Check Create URL ---
         window.onload = () => {
+            if (window.location.search.includes('create')) {
+                showCreateUser();
+                return;
+            }
             const cookieUser = getCookie('9c_user');
             if (cookieUser) {
                 currentUser = cookieUser;
-                showToast(`Angemeldet als: ${currentUser}`);
+                showToast(`Angemeldet als: ${formatUsername(currentUser)}`);
                 updateMenu();
             }
             loadLinks();
         };
 
-        // --- AUTH LOGIK ---
+        // --- Auth Logik ---
         document.getElementById('btn-user').onclick = async () => {
             if (currentUser) {
+                if (currentUser === 'LOCAL') {
+                    Dialog.open({ title: 'Hinweis', text: 'Das Local-Passwort kann nicht geändert werden.', buttons: [{text:'OK', class:'primary', action:'cancel'}]});
+                    return;
+                }
                 const change = await Dialog.open({
                     title: 'Passwort ändern', text: 'Möchtest du dein Passwort ändern?',
                     buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Ja, ändern', class: 'primary', action: 'ok' }]
@@ -389,10 +496,9 @@
         async function showLogin() {
             const username = await Dialog.open({
                 title: 'Anmelden', text: 'Bitte gib deinen Benutzernamen ein.',
-                fields: [{ placeholder: 'Benutzername', type: 'text' }],
+                fields: [{ placeholder: 'Benutzername' }],
                 buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Weiter', class: 'primary', action: 'ok' }]
             });
-            
             if (!username) return;
             const uname = sanitizeHTML(username.trim().toUpperCase());
             
@@ -400,43 +506,31 @@
                 checkPassword(uname, "08a06925eb603fb9d2caef4cbff40659a449ae3ac6ca26c561632c53e603e6825fb2bf9d4e863dc4f26d522cdc49690d66a509739e31f7ef060931a2ec042d64");
                 return;
             }
-
             try {
                 const res = await fetch(GIST_USERS + "?t=" + Date.now());
-                const text = await res.text();
-                const users = text.split('\n');
+                const users = (await res.text()).split('\n');
                 let foundHash = null;
-
                 for (let line of users) {
                     let parts = line.split(';');
-                    if (parts[0] === uname) { foundHash = parts[1] ? parts[1].trim() : null; break; }
+                    if (parts[0] === uname) { foundHash = parts[1]?.trim() || null; break; }
                 }
 
-                if (foundHash === null) {
-                    Dialog.open({ title: 'Fehler', text: 'Benutzer existiert nicht.', buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
-                } else if (foundHash === '-') {
-                    showSetPassword(uname);
-                } else {
-                    checkPassword(uname, foundHash);
-                }
-            } catch (e) {
-                Dialog.open({ title: 'Netzwerkfehler', text: 'Benutzerdaten konnten nicht geladen werden.', buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
-            }
+                if (foundHash === null) Dialog.open({ title: 'Fehler', text: 'Benutzer existiert nicht.', buttons: [{ text: 'OK', class: 'danger', action:'cancel'}] });
+                else if (foundHash === '-') showSetPassword(uname);
+                else checkPassword(uname, foundHash);
+            } catch (e) { Dialog.open({ title: 'Fehler', text: 'Benutzerdaten konnten nicht geladen werden.', buttons: [{text:'OK', class:'danger', action:'cancel'}]}); }
         }
 
         async function checkPassword(uname, correctHash) {
             const pwd = await Dialog.open({
-                title: 'Anmelden', text: `Willkommen zurück, ${uname}!`,
+                title: 'Anmelden', text: `Willkommen zurück, ${formatUsername(uname)}!`,
                 fields: [{ placeholder: 'Passwort', type: 'password' }],
                 buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Anmelden', class: 'primary', action: 'ok' }]
             });
             if (!pwd) return;
-            const h = await sha512(pwd);
-            if (h === correctHash) {
-                currentUser = uname;
-                setCookie('9c_user', uname, 7);
-                updateMenu();
-                showToast(`Erfolgreich angemeldet als ${uname}`);
+            if (await sha512(pwd) === correctHash) {
+                currentUser = uname; setCookie('9c_user', uname, 7); updateMenu();
+                showToast(`Angemeldet als: ${formatUsername(uname)}`);
             } else {
                 Dialog.open({ title: 'Fehler', text: 'Falsches Passwort!', buttons: [{ text: 'Schließen', class: 'danger', action: 'cancel' }] });
             }
@@ -445,244 +539,166 @@
         async function showSetPassword(uname) {
             const pwd = await Dialog.open({
                 title: 'Account einrichten',
-                text: 'Dein Account ist neu. Bitte lege jetzt ein Passwort fest.<br><br><small style="color:var(--text-muted)">Info: Passwörter werden lokal verschlüsselt (als Hash). Niemand, auch nicht der Admin, kann dein echtes Passwort sehen.</small>',
+                text: 'Dein Account ist neu. Bitte lege jetzt ein Passwort fest.<br><small style="color:var(--text-muted)">Passwörter werden lokal als Hash verschlüsselt.</small>',
                 fields: [{ placeholder: 'Neues Passwort', type: 'password' }],
-                buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Passwort festlegen', class: 'primary', action: 'ok' }]
+                buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Festlegen', class: 'primary', action: 'ok' }]
             });
-            
             if (!pwd) return;
-            if (pwd.length < 3) {
-                Dialog.open({ title: 'Fehler', text: 'Passwort zu kurz!', buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] }); return;
-            }
-
-            const h = await sha512(pwd);
-            sendPushcut(`9C-EDIT-REGISTER`, `${uname}%3B${h}`, "Dein Passwort wurde festgelegt. Du kannst dich nun anmelden!");
+            if (pwd.length < 3) { Dialog.open({ title: 'Fehler', text: 'Passwort zu kurz!', buttons: [{text:'OK', class:'danger', action:'cancel'}]}); return; }
+            
+            triggerServerSync(`9C-EDIT-REGISTER`, `${uname}%3B${await sha512(pwd)}`, () => {
+                Dialog.open({ title: 'Erfolg', text: 'Dein Passwort wurde festgelegt!', buttons: [{text:'OK', class:'primary', action:'cancel'}]});
+                currentUser = uname; setCookie('9c_user', uname, 7); updateMenu();
+                showToast(`Angemeldet als: ${formatUsername(uname)}`);
+            });
         }
 
         async function showChangePassword() {
             const pwd = await Dialog.open({
-                title: 'Passwort ändern', text: 'Gib dein neues Passwort ein.',
-                fields: [{ placeholder: 'Neues Passwort', type: 'password' }],
+                title: 'Passwort ändern', fields: [{ placeholder: 'Neues Passwort', type: 'password' }],
                 buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Ändern', class: 'primary', action: 'ok' }]
             });
             if (!pwd) return;
-            const h = await sha512(pwd);
-            sendPushcut(`9C-CHANGE-PASS`, `${currentUser}%3B${h}`, "Dein Passwort wurde erfolgreich geändert.");
+            triggerServerSync(`9C-CHANGE-PASS`, `${currentUser}%3B${await sha512(pwd)}`, () => {
+                Dialog.open({ title: 'Erfolg', text: 'Passwort wurde geändert.', buttons: [{text:'OK', class:'primary', action:'cancel'}]});
+            });
         }
 
-        async function sendPushcut(shortcut, payload, successMsg) {
-            try {
-                const res = await fetch(PUSHCUT_BASE + shortcut + "&input=" + payload);
-                if (res.ok) {
-                    Dialog.open({ title: 'Erfolg', text: successMsg, buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
-                } else {
-                    throw new Error("Server antwortete nicht mit OK");
-                }
-            } catch (e) {
-                Dialog.open({ title: 'Fehler', text: 'Server konnte nicht erreicht werden. (Ggf. CORS blockiert)', buttons: [{ text: 'OK', class: 'danger', action: 'cancel' }] });
-            }
+        async function showCreateUser() {
+            const data = await Dialog.open({
+                title: 'Neuen Benutzer anlegen',
+                fields: [{ placeholder: 'Wunsch-Benutzername' }, { placeholder: 'Passwort', type: 'password' }],
+                buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Fortfahren', class: 'primary', action: 'ok' }]
+            });
+            if(!data || !data[0] || !data[1]) return;
+            const uname = sanitizeHTML(data[0].trim().toUpperCase());
+            triggerServerSync(`9C-CREATE-USER`, `${uname}%3B${await sha512(data[1])}`, () => {
+                window.history.replaceState({}, document.title, window.location.pathname); // ?create aus URL entfernen
+                currentUser = uname; setCookie('9c_user', uname, 7); updateMenu(); loadLinks();
+                showToast(`Angemeldet als: ${formatUsername(uname)}`);
+            });
         }
 
-
-        // --- LINKS & BUTTONS LOGIK ---
+        // --- Links & Buttons (Korrektes Gist Parsing) ---
         async function loadLinks() {
-            const container = document.getElementById('button-container');
-            container.innerHTML = '';
+            const cont = document.getElementById('button-container'); cont.innerHTML = '';
             try {
-                const res = await fetch(GIST_LINKS + "?t=" + Date.now());
-                const text = await res.text();
+                const text = await (await fetch(GIST_LINKS + "?t=" + Date.now())).text();
                 linksData = [];
-
                 text.split('\n').forEach(line => {
-                    line = line.trim();
-                    if (!line) return;
+                    line = line.trim(); if(!line) return;
                     
-                    // Fallback für altes Format falls vorhanden
-                    line = line.replace(/;-;/g, ';');
+                    // Neues robustes Splitting am ;-;
+                    let parts = line.split(';-;');
+                    if(parts.length < 2) return;
                     
-                    let parts = line.split(';');
-                    let label = parts[0]?.trim();
-                    let pwd = (parts[1]?.trim()) || '-';
-                    let target = parts[2]?.trim() || '';
-                    let popupText = parts.slice(3).join(';')?.trim() || '';
+                    let label = parts[0].trim();
+                    let pwd = '-';
+                    let targetFull = '';
                     
-                    if (!label || !target) return;
+                    if (parts.length === 2) {
+                        targetFull = parts[1].trim();
+                    } else if (parts.length >= 3) {
+                        pwd = parts[1].trim() || '-';
+                        targetFull = parts.slice(2).join(';-;').trim();
+                    }
+
+                    let target = targetFull;
+                    let popupText = '';
+                    let semi = targetFull.indexOf(';');
+                    if(semi !== -1) {
+                        target = targetFull.substring(0, semi);
+                        popupText = targetFull.substring(semi + 1);
+                    }
+
                     linksData.push({ label, password: pwd, target, popupText });
 
                     const btn = document.createElement('button');
-                    btn.className = 'glass-btn';
-                    btn.textContent = label;
-                    if (target.toUpperCase() === 'X') {
-                        btn.disabled = true;
-                    } else {
-                        btn.onclick = () => handleLinkClick(label, pwd, target, popupText);
-                    }
-                    container.appendChild(btn);
+                    btn.className = 'glass-btn'; btn.textContent = label;
+                    if (target.toUpperCase() === 'X') btn.disabled = true;
+                    else btn.onclick = () => handleLinkClick(label, pwd, target, popupText);
+                    cont.appendChild(btn);
                 });
-            } catch (e) {
-                container.innerHTML = '<p style="color:var(--danger); grid-column:1/-1; text-align:center;">Fehler beim Laden der Links.</p>';
-            }
+            } catch(e) { cont.innerHTML = '<p style="color:var(--danger); grid-column:1/-1; text-align:center;">Fehler beim Laden.</p>'; }
         }
 
         async function handleLinkClick(label, password, target, popupText) {
             if (password !== '-' && password !== '') {
                 const input = await Dialog.open({
-                    title: 'Geschützt', text: `Passwort für "${label}" erforderlich:`,
+                    title: 'Geschützt', text: `Passwort für "${label}":`,
                     fields: [{ type: 'password', placeholder: 'Passwort' }],
                     buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Entsperren', class: 'primary', action: 'ok' }]
                 });
-                if (input === null) return;
-                if (input !== password) {
-                    Dialog.open({ title: 'Abgelehnt', text: 'Falsches Passwort!', buttons: [{ text: 'Schließen', class: 'danger', action: 'cancel' }] });
-                    return;
-                }
+                if (!input) return;
+                if (input !== password) { Dialog.open({ title: 'Fehler', text: 'Falsches Passwort!', buttons: [{text:'OK', class:'danger', action:'cancel'}]}); return; }
             }
-
-            const isLink = target.toLowerCase().startsWith('http');
-            if (isLink) {
+            if (target.toLowerCase().startsWith('http')) {
                 if (popupText) {
-                    const proceed = await Dialog.open({
-                        title: label, text: popupText,
-                        buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Weiter zum Link', class: 'primary', action: 'ok' }]
-                    });
-                    if (proceed) window.open(target, '_blank');
-                } else {
-                    window.open(target, '_blank');
-                }
-            } else {
-                Dialog.open({ title: label, text: target, buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
-            }
+                    const ok = await Dialog.open({ title: label, text: popupText, buttons: [{text:'Abbrechen',action:'cancel'}, {text:'Weiter',class:'primary',action:'ok'}]});
+                    if(ok) window.open(target, '_blank');
+                } else window.open(target, '_blank');
+            } else { Dialog.open({ title: label, text: target, buttons: [{text:'OK', class:'primary', action:'cancel'}] }); }
         }
 
-        // --- EDITOR LOGIK ---
-        document.getElementById('btn-edit').onclick = showEditorList;
-        document.getElementById('btn-admin').onclick = () => {
-            Dialog.open({title: 'Admin Panel', text: 'Dieser Bereich ist noch in Entwicklung.', buttons: [{text:'OK', class:'primary', action:'cancel'}]});
-        };
+        // --- Editor Logik ---
+        document.getElementById('btn-edit').onclick = () => { editorData = JSON.parse(JSON.stringify(linksData)); isDirty = false; renderEditor(); };
+        document.getElementById('btn-admin').onclick = () => Dialog.open({title:'Admin', text:'In Entwicklung.', buttons:[{text:'OK',class:'primary',action:'cancel'}]});
 
-        function showEditorList() {
-            editorData = JSON.parse(JSON.stringify(linksData));
-            isDirty = false;
-            renderEditorList();
-        }
-
-        function renderEditorList() {
-            let html = '<div class="editor-list">';
+        function renderEditor() {
+            let h = '<div class="editor-list">';
             editorData.forEach((l, i) => {
-                html += `<div class="editor-item">
-                            <span>${sanitizeHTML(l.label)}</span>
-                            <div class="editor-actions">
-                                <button class="icon-btn" onclick="editItem(${i})"><svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                                <button class="icon-btn delete" onclick="deleteItem(${i})"><svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
-                            </div>
-                         </div>`;
+                h += `<div class="editor-item"><span>${sanitizeHTML(l.label)}</span>
+                        <div class="editor-actions">
+                            <button class="icon-btn" onclick="editItem(${i})"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                            <button class="icon-btn delete" onclick="deleteItem(${i})"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
+                        </div></div>`;
             });
-            html += '</div>';
-
+            h += '</div>';
             Dialog.open({
-                title: 'Editor Modus', customClass: 'editor-mode', alignActions: 'right', customHTML: html,
-                buttons: [
-                    { text: 'Schließen', action: checkDirtyClose },
-                    { text: '+ Neuer Button', action: () => editItem(-1) },
-                    { text: 'Änderungen Speichern', class: 'primary', action: saveToGist }
-                ]
+                title: 'Editor Modus', customClass: 'editor-mode', alignActions: 'right', customHTML: h,
+                buttons: [ { text: 'Schließen', action: checkDirtyClose }, { text: '+ Neu', action: () => editItem(-1) }, { text: 'Speichern', class: 'primary', action: saveGist } ]
             });
         }
 
-        function editItem(index) {
-            const isNew = index === -1;
-            const item = isNew ? {label:'', password:'-', target:'', popupText:''} : editorData[index];
-            
+        function editItem(i) {
+            const isNew = i === -1; const it = isNew ? {label:'', password:'-', target:'', popupText:''} : editorData[i];
             Dialog.open({
-                title: isNew ? 'Neuer Button' : 'Button bearbeiten', customClass: 'editor-mode',
+                title: isNew ? 'Neuer Button' : 'Bearbeiten', customClass: 'editor-mode',
                 fields: [
-                    { label: 'Label *', value: item.label, placeholder: 'Name des Buttons' },
-                    { label: 'Passwort (optional, "-" für keins)', value: item.password, placeholder: '-' },
-                    { label: 'Link / Ziel * ("X" zum deaktivieren)', value: item.target, placeholder: 'https://...' },
-                    { label: 'Hinweis (Optionales Popup vor dem Link)', value: item.popupText, placeholder: 'Achtung: Externe Seite...' }
+                    { label: 'Label *', value: it.label }, { label: 'Passwort ("-" für keins)', value: it.password },
+                    { label: 'Link ("X" zum deaktivieren) *', value: it.target }, { label: 'Hinweis (Optional)', value: it.popupText }
                 ],
                 buttons: [
-                    { text: 'Abbrechen', action: renderEditorList },
-                    { text: 'Übernehmen', class: 'primary', action: (dlg) => {
-                        const vals = dlg.inputs.querySelectorAll('input');
-                        const newLabel = sanitizeGistInput(vals[0].value);
-                        const newPwd = sanitizeGistInput(vals[1].value) || '-';
-                        const newTarget = sanitizeGistInput(vals[2].value);
-                        const newPopup = sanitizeGistInput(vals[3].value);
-                        
-                        if(!newLabel || !newTarget) {
-                            alert("Label und Link sind Pflichtfelder!"); return;
-                        }
-                        
-                        const newItem = { label: newLabel, password: newPwd, target: newTarget, popupText: newPopup };
-                        if (isNew) editorData.push(newItem);
-                        else editorData[index] = newItem;
-                        
-                        isDirty = true;
-                        renderEditorList();
+                    { text: 'Abbrechen', action: renderEditor },
+                    { text: 'Übernehmen', class: 'primary', action: dlg => {
+                        const v = dlg.inputs.querySelectorAll('input');
+                        const nL = sanitizeGistInput(v[0].value), nP = sanitizeGistInput(v[1].value)||'-', nT = sanitizeGistInput(v[2].value), nU = sanitizeGistInput(v[3].value);
+                        if(!nL || !nT) { alert("Label & Link sind Pflicht!"); return; }
+                        isNew ? editorData.push({label:nL, password:nP, target:nT, popupText:nU}) : editorData[i] = {label:nL, password:nP, target:nT, popupText:nU};
+                        isDirty = true; renderEditor();
                     }}
                 ]
             });
         }
-
-        function deleteItem(index) {
-            editorData.splice(index, 1);
-            isDirty = true;
-            renderEditorList();
-        }
+        function deleteItem(i) { editorData.splice(i, 1); isDirty = true; renderEditor(); }
 
         async function checkDirtyClose(dlg) {
-            if (!isDirty) { dlg.close(); return; }
-            const confirm = await Dialog.open({
-                title: 'Ungespeicherte Änderungen', text: 'Willst du wirklich schließen ohne zu speichern?',
-                buttons: [{ text: 'Zurück', action: 'cancel' }, { text: 'Nicht speichern', class: 'danger', action: 'ok' }]
+            if(!isDirty) { dlg.close(); return; }
+            const c = await Dialog.open({ title: 'Ungespeichert', text: 'Wirklich ohne Speichern schließen?', buttons: [{text:'Zurück', action:'cancel'}, {text:'Verwerfen', class:'danger', action:'ok'}]});
+            if(c) { isDirty = false; Dialog.close(); } else renderEditor();
+        }
+
+        function saveGist(dlg) {
+            if(!isDirty) { dlg.close(); return; }
+            let lines = editorData.map(l => l.password !== '-' && l.password !== '' 
+                ? `${l.label};-;\${l.password};-;\${l.target}${l.popupText ? ';' + l.popupText : ''}`
+                : `${l.label};-;\${l.target}${l.popupText ? ';' + l.popupText : ''}`
+            );
+            
+            triggerServerSync(`9C-EDIT-APPLY`, encodeURIComponent(lines.join('\n').replace(/\n/g, '~')), () => {
+                dlg.close(); location.reload();
             });
-            if (confirm) {
-                isDirty = false;
-                Dialog.close();
-            } else {
-                renderEditorList(); // zurück zum editor
-            }
         }
-
-        async function saveToGist(dlg) {
-            if (!isDirty) { dlg.close(); return; }
-            
-            let lines = editorData.map(l => {
-                let parts = [l.label, l.password, l.target];
-                if (l.popupText) parts.push(l.popupText);
-                return parts.join(';');
-            });
-            let rawText = lines.join('\n');
-            
-            // Formatierung für Pushcut: \n zu ~ und URL-Encoding für ; / : Leerzeichen
-            let payload = encodeURIComponent(rawText.replace(/\n/g, '~'));
-
-            try {
-                // Sende an Pushcut (Fire and forget, wir vertrauen dem API Call)
-                fetch(PUSHCUT_BASE + "9C-EDIT-APPLY&input=" + payload, { mode: 'no-cors' });
-                
-                dlg.close();
-                startLoadingBar();
-            } catch (e) {
-                alert("Fehler beim senden an Server");
-            }
-        }
-
-        function startLoadingBar() {
-            const loader = document.getElementById('loader');
-            const bar = document.getElementById('loader-bar');
-            loader.classList.add('active');
-            
-            // Trigger animation
-            setTimeout(() => { bar.style.width = '100%'; }, 50);
-
-            // Nach 3 Sekunden Seite neu laden
-            setTimeout(() => {
-                location.reload();
-            }, 3000);
-        }
-
     </script>
 </body>
 </html>
