@@ -1,392 +1,688 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <!--
-Source - https://stackoverflow.com/a/42966673
-Posted by Dmitry Pleshkov, modified by community. See post 'Timeline' for change history
-Retrieved 2026-09-23, License - CC BY-SA 3.0
--->
-
- <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Sammlung</title>
+    <title>9C</title>
+    <!-- Favicon von GitHub -->
+    <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Kleinlauch/9C/main/favicon.ico">
+    <!-- Quicksand Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-color: #0f0f13;
+            --bg-color: #0b0c10;
             --glass-bg: rgba(255, 255, 255, 0.05);
             --glass-border: rgba(255, 255, 255, 0.1);
+            --glass-hover: rgba(255, 255, 255, 0.12);
             --accent: #4ade80;
             --accent-glow: rgba(74, 222, 128, 0.4);
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --danger: #ef4444;
+            --danger-glow: rgba(239, 68, 68, 0.4);
         }
 
         body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: radial-gradient(circle at top right, #1a1a24, var(--bg-color)), 
-                        url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" opacity="0.08"%3E%3Ccircle cx="200" cy="200" r="150" fill="%234ade80" filter="blur(100px)"/%3E%3C/svg%3E') no-repeat center center fixed;
+            margin: 0; padding: 0; min-height: 100vh;
+            background: radial-gradient(circle at top right, #1e1e2d, var(--bg-color)), 
+                        url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="400" opacity="0.05"%3E%3Ccircle cx="200" cy="200" r="150" fill="%234ade80" filter="blur(100px)"/%3E%3C/svg%3E') no-repeat center center fixed;
             background-size: cover;
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Quicksand', sans-serif;
             color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 2rem;
-            box-sizing: border-box;
+            display: flex; flex-direction: column; align-items: center;
+            padding: 2rem; box-sizing: border-box;
+            user-select: none;
         }
 
-        h1 {
-            margin-bottom: 2.5rem;
-            font-weight: 300;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-align: center;
-            text-shadow: 0 0 20px rgba(255,255,255,0.2);
+        h1.title {
+            font-size: 4rem; font-weight: 300; letter-spacing: 5px;
+            margin-bottom: 3rem; text-align: center;
+            text-shadow: 0 0 25px rgba(255,255,255,0.3);
         }
 
+        /* Haupt-Button Raster */
         #button-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 1.5rem;
-            width: 100%;
-            max-width: 1000px;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem; width: 100%; max-width: 1000px;
         }
 
         .glass-btn {
-            background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            color: var(--text-main);
-            font-size: 1.1rem;
-            font-weight: 500;
-            cursor: pointer;
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: var(--glass-bg); border: 1px solid var(--glass-border);
+            border-radius: 16px; padding: 1.5rem; color: var(--text-main);
+            font-size: 1.2rem; font-family: 'Quicksand', sans-serif; font-weight: 600;
+            cursor: pointer; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
             transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            word-wrap: break-word;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            position: relative; overflow: hidden; word-wrap: break-word;
         }
-
         .glass-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.08), transparent);
-            transform: skewX(-25deg);
-            transition: all 0.5s ease;
+            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-25deg); transition: all 0.6s ease;
         }
-
         .glass-btn:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-4px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
+            background: var(--glass-hover); border-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4), 0 0 20px var(--accent-glow);
         }
-
-        .glass-btn:hover:not(:disabled)::before {
-            left: 200%;
-        }
-
+        .glass-btn:hover:not(:disabled)::before { left: 200%; }
         .glass-btn:disabled {
-            background: rgba(255, 255, 255, 0.02);
-            color: var(--text-muted);
-            cursor: not-allowed;
-            border-color: rgba(255, 255, 255, 0.03);
-            box-shadow: none;
-            backdrop-filter: blur(4px);
-            -webkit-backdrop-filter: blur(4px);
+            background: rgba(255, 255, 255, 0.02); color: var(--text-muted); cursor: not-allowed;
+            border-color: rgba(255, 255, 255, 0.02); box-shadow: none;
         }
 
+        /* Seitenmenü / Floating Action Menu */
+        .side-menu {
+            position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 12px; z-index: 100;
+        }
+        .menu-item {
+            display: flex; align-items: center; background: rgba(20, 20, 25, 0.6);
+            border: 1px solid var(--glass-border); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            padding: 12px; border-radius: 16px; cursor: pointer; color: white;
+            transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .menu-item svg { width: 24px; height: 24px; flex-shrink: 0; }
+        .menu-item span { display: none; margin-left: 12px; font-weight: 600; font-size: 1rem; white-space: nowrap; }
+        .menu-item:hover { background: var(--glass-hover); border-color: var(--accent); color: var(--accent); }
+        .menu-item.danger:hover { border-color: var(--danger); color: var(--danger); }
+        
+        @media (min-width: 768px) and (orientation: landscape) {
+            .menu-item span { display: inline; }
+            .menu-item { padding: 12px 20px 12px 12px; }
+        }
+
+        /* Modals (Popups) */
         .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+            display: flex; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: all 0.3s ease; padding: 1rem; box-sizing: border-box;
         }
-
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
+        .modal-overlay.active { opacity: 1; visibility: visible; }
+        
         .modal-box {
-            background: rgba(20, 20, 25, 0.85);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 2.5rem;
-            width: 90%;
-            max-width: 450px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,255,255,0.05);
-            transform: translateY(20px) scale(0.95);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-align: center;
+            background: rgba(25, 25, 32, 0.85); border: 1px solid var(--glass-border);
+            border-radius: 24px; padding: 2.5rem; width: 100%; max-width: 450px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(255,255,255,0.05);
+            transform: translateY(30px) scale(0.95); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: center; max-height: 90vh; overflow-y: auto;
         }
+        .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
+        
+        .modal-box.editor-mode { max-width: 800px; text-align: left; }
 
-        .modal-overlay.active .modal-box {
-            transform: translateY(0) scale(1);
-        }
-
-        .modal-text {
-            font-size: 1.15rem;
-            line-height: 1.6;
-            margin-bottom: 2rem;
-            word-wrap: break-word;
-            color: #e5e7eb;
-        }
-
+        .modal-title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: white; }
+        .modal-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 2rem; color: var(--text-muted); }
+        
         .modal-input {
-            width: 100%;
-            padding: 14px 16px;
-            margin-bottom: 20px;
-            background: rgba(0,0,0,0.4);
-            border: 1px solid var(--glass-border);
-            border-radius: 12px;
-            color: white;
-            font-size: 1rem;
-            box-sizing: border-box;
-            outline: none;
-            transition: border-color 0.3s, box-shadow 0.3s;
+            width: 100%; padding: 15px 20px; margin-bottom: 1.5rem;
+            background: rgba(0,0,0,0.5); border: 1px solid var(--glass-border); border-radius: 14px;
+            color: white; font-size: 1.1rem; font-family: 'Quicksand', sans-serif;
+            box-sizing: border-box; outline: none; transition: 0.3s;
         }
-
-        .modal-input:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 10px var(--accent-glow);
-        }
-
-        .modal-actions {
-            display: flex;
-            gap: 1rem;
-            justify-content: center;
-        }
-
+        .modal-input:focus { border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        
+        .modal-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1rem; }
+        .modal-actions.right { justify-content: flex-end; }
+        
         .modal-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--glass-border);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: all 0.2s;
+            background: var(--glass-bg); border: 1px solid var(--glass-border); color: white;
+            padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 1.1rem;
+            font-family: 'Quicksand', sans-serif; font-weight: 600; transition: 0.2s;
         }
+        .modal-btn:hover { background: var(--glass-hover); }
+        .modal-btn.primary { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 15px var(--accent-glow); }
+        .modal-btn.primary:hover { background: #34d399; box-shadow: 0 0 25px var(--accent-glow); }
+        .modal-btn.danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border-color: rgba(239, 68, 68, 0.3); }
+        .modal-btn.danger:hover { background: var(--danger); color: white; box-shadow: 0 0 15px var(--danger-glow); }
 
-        .modal-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
+        /* Editor Liste */
+        .editor-list { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 2rem; }
+        .editor-item { 
+            display: flex; justify-content: space-between; align-items: center; 
+            background: rgba(0,0,0,0.3); padding: 1rem 1.5rem; border-radius: 12px; border: 1px solid var(--glass-border);
         }
+        .editor-item span { font-weight: 600; font-size: 1.1rem; }
+        .editor-actions { display: flex; gap: 0.5rem; }
+        .icon-btn { 
+            background: transparent; border: none; color: var(--text-muted); cursor: pointer; 
+            padding: 8px; transition: 0.2s; border-radius: 8px;
+        }
+        .icon-btn:hover { background: var(--glass-bg); color: white; }
+        .icon-btn.delete:hover { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
 
-        .modal-btn.primary {
-            background: var(--accent);
-            color: #000;
-            border-color: var(--accent);
-            font-weight: 600;
-            box-shadow: 0 0 10px rgba(74, 222, 128, 0.2);
+        /* Toast */
+        .toast {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            background: rgba(20,20,25,0.9); border: 1px solid var(--accent); color: white;
+            padding: 12px 24px; border-radius: 30px; font-weight: 600; box-shadow: 0 5px 20px var(--accent-glow);
+            transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 2000;
         }
+        .toast.show { top: 30px; }
 
-        .modal-btn.primary:hover {
-            background: #34d399;
-            box-shadow: 0 0 20px var(--accent-glow);
+        /* Loading Bar */
+        .loader-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000;
+            background: rgba(0,0,0,0.9); display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; visibility: hidden; transition: 0.3s;
         }
+        .loader-overlay.active { opacity: 1; visibility: visible; }
+        .loader-text { color: var(--accent); font-size: 1.5rem; font-weight: 600; margin-bottom: 2rem; text-transform: uppercase; letter-spacing: 2px;}
+        .loader-bar-container { width: 300px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .loader-bar { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 15px var(--accent); transition: width 3s linear; }
 
-        .error-msg {
-            color: #ef4444;
-            text-align: center;
-            font-size: 1.2rem;
-            grid-column: 1 / -1;
-        }
+        label { display: block; margin-bottom: 5px; color: var(--text-muted); font-size: 0.9rem; }
     </style>
 </head>
 <body>
+    <div id="toast" class="toast"></div>
 
-    <h1>Link Sammlung</h1>
-    <div id="button-container"></div>
-
-    <div id="custom-modal" class="modal-overlay">
-        <div class="modal-box">
-            <div id="modal-content" class="modal-text"></div>
-            <input type="password" id="modal-password" class="modal-input" style="display: none;" placeholder="Passwort eingeben...">
-            <div id="modal-actions" class="modal-actions">
-                <button id="modal-cancel" class="modal-btn" style="display: none;">Abbrechen</button>
-                <button id="modal-ok" class="modal-btn primary">OK</button>
-            </div>
+    <div class="side-menu" id="side-menu">
+        <div class="menu-item" id="btn-user">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 12a5 5 0 100-10 5 5 0 000 10zM20 21a8 8 0 10-16 0"/></svg>
+            <span>Benutzer</span>
+        </div>
+        <div class="menu-item" id="btn-edit" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            <span>Bearbeiten</span>
+        </div>
+        <div class="menu-item danger" id="btn-signout" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3"/></svg>
+            <span>Abmelden</span>
+        </div>
+        <div class="menu-item" id="btn-admin" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 12h20M6 8h.01M6 16h.01"/></svg>
+            <span>Admin Panel</span>
         </div>
     </div>
 
+    <h1 class="title">9C</h1>
+    <div id="button-container"></div>
+
+    <!-- Universal Dialog -->
+    <div id="dialog-overlay" class="modal-overlay">
+        <div class="modal-box" id="dialog-box">
+            <div id="dialog-title" class="modal-title"></div>
+            <div id="dialog-text" class="modal-text"></div>
+            <div id="dialog-input-container"></div>
+            <div class="modal-actions" id="dialog-actions"></div>
+        </div>
+    </div>
+
+    <!-- Loading Bar -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader-text">Übernehme Änderungen...</div>
+        <div class="loader-bar-container"><div class="loader-bar" id="loader-bar"></div></div>
+    </div>
+
     <script>
-        const GIST_RAW_URL = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw/command.txt";
+        // Rechtsklick blockieren
+        document.addEventListener('contextmenu', e => e.preventDefault());
 
-        const modal = document.getElementById('custom-modal');
-        const modalContent = document.getElementById('modal-content');
-        const modalPassword = document.getElementById('modal-password');
-        const modalCancel = document.getElementById('modal-cancel');
-        const modalOk = document.getElementById('modal-ok');
-        const container = document.getElementById('button-container');
+        const GIST_LINKS = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw/command.txt";
+        const GIST_USERS = "https://gist.githubusercontent.com/Kleinlauch/6ccb29c799b9a8ef77998a16fec5dfbf/raw/command.txt";
+        const PUSHCUT_BASE = "https://api.pushcut.io/loPBXSU7lmRjUzDvwnMUm/execute?shortcut=";
 
-        let currentModalCallback = null;
+        let currentUser = null;
+        let linksData = [];
+        let editorData = [];
+        let isDirty = false;
 
-        function showModal(text, options = {}) {
-            modalContent.textContent = text;
-            
-            modalPassword.style.display = options.isPassword ? 'block' : 'none';
-            if (options.isPassword) {
-                modalPassword.value = '';
-                setTimeout(() => modalPassword.focus(), 100);
-            }
-
-            modalCancel.style.display = options.showCancel ? 'block' : 'none';
-            modalOk.textContent = options.okText || 'OK';
-
-            modal.classList.add('active');
-
-            return new Promise((resolve) => {
-                currentModalCallback = resolve;
-            });
+        // Hilfsfunktionen
+        async function sha512(str) {
+            const buf = await crypto.subtle.digest("SHA-512", new TextEncoder("utf-8").encode(str));
+            return Array.prototype.map.call(new Uint8Array(buf), x=>(('00'+x.toString(16)).slice(-2))).join('');
         }
 
-        function closeModal() {
-            modal.classList.remove('active');
-            setTimeout(() => {
-                modalPassword.style.display = 'none';
-                modalCancel.style.display = 'none';
-                currentModalCallback = null;
-            }, 300);
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                let date = new Date();
+                date.setTime(date.getTime() + (days*24*60*60*1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "")  + expires + "; path=/; SameSite=Strict";
+        }
+        function getCookie(name) {
+            let nameEQ = name + "=";
+            let ca = document.cookie.split(';');
+            for(let i=0;i < ca.length;i++) {
+                let c = ca[i];
+                while (c.charAt(0)==' ') c = c.substring(1,c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+            }
+            return null;
+        }
+        function deleteCookie(name) { document.cookie = name+'=; Max-Age=-99999999;'; }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
-        modalOk.addEventListener('click', () => {
-            if (currentModalCallback) {
-                const isPassword = modalPassword.style.display !== 'none';
-                const val = isPassword ? modalPassword.value : true;
-                currentModalCallback(val);
-                closeModal();
-            }
-        });
+        function sanitizeHTML(str) {
+            return str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag] || tag));
+        }
+        // Verhindert, dass Formatierungszeichen (; oder ~ oder Zeilenumbrüche) ins Gist kommen
+        function sanitizeGistInput(str) {
+            return sanitizeHTML(str.replace(/[;~\n\r]/g, ' ')).trim();
+        }
 
-        modalCancel.addEventListener('click', () => {
-            if (currentModalCallback) {
-                currentModalCallback(false);
-                closeModal();
-            }
-        });
+        // Custom Dialog Manager (Ersatz für prompt, alert, confirm)
+        const Dialog = {
+            overlay: document.getElementById('dialog-overlay'),
+            box: document.getElementById('dialog-box'),
+            title: document.getElementById('dialog-title'),
+            text: document.getElementById('dialog-text'),
+            inputs: document.getElementById('dialog-input-container'),
+            actions: document.getElementById('dialog-actions'),
+            resolvePromise: null,
 
-        modalPassword.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') modalOk.click();
-        });
+            open(config) {
+                return new Promise(resolve => {
+                    this.resolvePromise = resolve;
+                    this.box.className = 'modal-box ' + (config.customClass || '');
+                    this.title.textContent = config.title || '';
+                    this.text.innerHTML = config.text || '';
+                    this.inputs.innerHTML = '';
+                    this.actions.innerHTML = '';
+                    this.actions.className = 'modal-actions ' + (config.alignActions || '');
 
-        async function handleButtonClick(config) {
-            if (config.password) {
-                const passInput = await showModal('Bitte Passwort eingeben:', {
-                    isPassword: true,
-                    showCancel: true,
-                    okText: 'Bestätigen'
-                });
-
-                if (passInput === false) return; 
-                if (passInput !== config.password) {
-                    await showModal('Falsches Passwort!', { okText: 'Schließen' });
-                    return;
-                }
-            }
-
-            if (config.isLink) {
-                if (config.popupText) {
-                    const proceed = await showModal(config.popupText, {
-                        showCancel: true,
-                        okText: 'Weiter zum Link'
-                    });
-                    if (proceed) {
-                        window.open(config.target, '_blank');
+                    if (config.fields) {
+                        config.fields.forEach((f, idx) => {
+                            if(f.label) {
+                                let l = document.createElement('label'); l.textContent = f.label; this.inputs.appendChild(l);
+                            }
+                            let inp = document.createElement('input');
+                            inp.type = f.type || 'text';
+                            inp.className = 'modal-input';
+                            inp.placeholder = f.placeholder || '';
+                            inp.value = f.value || '';
+                            inp.id = 'dialog-inp-' + idx;
+                            if (idx === 0) setTimeout(() => inp.focus(), 100);
+                            inp.addEventListener('keydown', (e) => {
+                                if (e.key === 'Enter') this.submit(config.buttons);
+                            });
+                            this.inputs.appendChild(inp);
+                        });
+                    } else if (config.customHTML) {
+                        this.inputs.innerHTML = config.customHTML;
                     }
-                } else {
-                    window.open(config.target, '_blank');
+
+                    if (config.buttons) {
+                        config.buttons.forEach(b => {
+                            let btn = document.createElement('button');
+                            btn.className = 'modal-btn ' + (b.class || '');
+                            btn.textContent = b.text;
+                            btn.onclick = () => this.handleBtnClick(b.action);
+                            this.actions.appendChild(btn);
+                        });
+                    }
+
+                    this.overlay.classList.add('active');
+                });
+            },
+            
+            submit(buttons) {
+                const primaryBtn = buttons.find(b => b.class.includes('primary'));
+                if (primaryBtn) this.handleBtnClick(primaryBtn.action);
+            },
+
+            handleBtnClick(action) {
+                if (action === 'cancel') {
+                    this.close(null);
+                } else if (action === 'ok') {
+                    const inputs = this.inputs.querySelectorAll('input');
+                    if (inputs.length === 1) this.close(inputs[0].value);
+                    else if (inputs.length > 1) {
+                        let res = []; inputs.forEach(i => res.push(i.value)); this.close(res);
+                    } else this.close(true);
+                } else if (typeof action === 'function') {
+                    action(this);
                 }
+            },
+
+            close(val) {
+                this.overlay.classList.remove('active');
+                setTimeout(() => { if (this.resolvePromise) this.resolvePromise(val); }, 300);
+            }
+        };
+
+        // UI Updates
+        function updateMenu() {
+            document.getElementById('btn-edit').style.display = currentUser ? 'flex' : 'none';
+            document.getElementById('btn-signout').style.display = currentUser ? 'flex' : 'none';
+            document.getElementById('btn-admin').style.display = (currentUser === 'MARCO' || currentUser === 'LOCAL') ? 'flex' : 'none';
+        }
+
+        // Init
+        window.onload = () => {
+            const cookieUser = getCookie('9c_user');
+            if (cookieUser) {
+                currentUser = cookieUser;
+                showToast(`Angemeldet als: ${currentUser}`);
+                updateMenu();
+            }
+            loadLinks();
+        };
+
+        // --- AUTH LOGIK ---
+        document.getElementById('btn-user').onclick = async () => {
+            if (currentUser) {
+                const change = await Dialog.open({
+                    title: 'Passwort ändern', text: 'Möchtest du dein Passwort ändern?',
+                    buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Ja, ändern', class: 'primary', action: 'ok' }]
+                });
+                if (change) showChangePassword();
             } else {
-                await showModal(config.target, { okText: 'OK' });
+                showLogin();
+            }
+        };
+
+        document.getElementById('btn-signout').onclick = () => {
+            deleteCookie('9c_user'); currentUser = null; updateMenu();
+            showToast("Erfolgreich abgemeldet");
+        };
+
+        async function showLogin() {
+            const username = await Dialog.open({
+                title: 'Anmelden', text: 'Bitte gib deinen Benutzernamen ein.',
+                fields: [{ placeholder: 'Benutzername', type: 'text' }],
+                buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Weiter', class: 'primary', action: 'ok' }]
+            });
+            
+            if (!username) return;
+            const uname = sanitizeHTML(username.trim().toUpperCase());
+            
+            if (uname === 'LOCAL') {
+                checkPassword(uname, "08a06925eb603fb9d2caef4cbff40659a449ae3ac6ca26c561632c53e603e6825fb2bf9d4e863dc4f26d522cdc49690d66a509739e31f7ef060931a2ec042d64");
+                return;
+            }
+
+            try {
+                const res = await fetch(GIST_USERS + "?t=" + Date.now());
+                const text = await res.text();
+                const users = text.split('\n');
+                let foundHash = null;
+
+                for (let line of users) {
+                    let parts = line.split(';');
+                    if (parts[0] === uname) { foundHash = parts[1] ? parts[1].trim() : null; break; }
+                }
+
+                if (foundHash === null) {
+                    Dialog.open({ title: 'Fehler', text: 'Benutzer existiert nicht.', buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
+                } else if (foundHash === '-') {
+                    showSetPassword(uname);
+                } else {
+                    checkPassword(uname, foundHash);
+                }
+            } catch (e) {
+                Dialog.open({ title: 'Netzwerkfehler', text: 'Benutzerdaten konnten nicht geladen werden.', buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
             }
         }
 
-        async function loadLinks() {
+        async function checkPassword(uname, correctHash) {
+            const pwd = await Dialog.open({
+                title: 'Anmelden', text: `Willkommen zurück, ${uname}!`,
+                fields: [{ placeholder: 'Passwort', type: 'password' }],
+                buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Anmelden', class: 'primary', action: 'ok' }]
+            });
+            if (!pwd) return;
+            const h = await sha512(pwd);
+            if (h === correctHash) {
+                currentUser = uname;
+                setCookie('9c_user', uname, 7);
+                updateMenu();
+                showToast(`Erfolgreich angemeldet als ${uname}`);
+            } else {
+                Dialog.open({ title: 'Fehler', text: 'Falsches Passwort!', buttons: [{ text: 'Schließen', class: 'danger', action: 'cancel' }] });
+            }
+        }
+
+        async function showSetPassword(uname) {
+            const pwd = await Dialog.open({
+                title: 'Account einrichten',
+                text: 'Dein Account ist neu. Bitte lege jetzt ein Passwort fest.<br><br><small style="color:var(--text-muted)">Info: Passwörter werden lokal verschlüsselt (als Hash). Niemand, auch nicht der Admin, kann dein echtes Passwort sehen.</small>',
+                fields: [{ placeholder: 'Neues Passwort', type: 'password' }],
+                buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Passwort festlegen', class: 'primary', action: 'ok' }]
+            });
+            
+            if (!pwd) return;
+            if (pwd.length < 3) {
+                Dialog.open({ title: 'Fehler', text: 'Passwort zu kurz!', buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] }); return;
+            }
+
+            const h = await sha512(pwd);
+            sendPushcut(`9C-EDIT-REGISTER`, `${uname}%3B${h}`, "Dein Passwort wurde festgelegt. Du kannst dich nun anmelden!");
+        }
+
+        async function showChangePassword() {
+            const pwd = await Dialog.open({
+                title: 'Passwort ändern', text: 'Gib dein neues Passwort ein.',
+                fields: [{ placeholder: 'Neues Passwort', type: 'password' }],
+                buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Ändern', class: 'primary', action: 'ok' }]
+            });
+            if (!pwd) return;
+            const h = await sha512(pwd);
+            sendPushcut(`9C-CHANGE-PASS`, `${currentUser}%3B${h}`, "Dein Passwort wurde erfolgreich geändert.");
+        }
+
+        async function sendPushcut(shortcut, payload, successMsg) {
             try {
-                const response = await fetch(GIST_RAW_URL + "?t=" + new Date().getTime());
-                if (!response.ok) throw new Error("Netzwerkfehler");
-                const text = await response.text();
-                
-                const lines = text.split('\n');
-                
-                lines.forEach(line => {
+                const res = await fetch(PUSHCUT_BASE + shortcut + "&input=" + payload);
+                if (res.ok) {
+                    Dialog.open({ title: 'Erfolg', text: successMsg, buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
+                } else {
+                    throw new Error("Server antwortete nicht mit OK");
+                }
+            } catch (e) {
+                Dialog.open({ title: 'Fehler', text: 'Server konnte nicht erreicht werden. (Ggf. CORS blockiert)', buttons: [{ text: 'OK', class: 'danger', action: 'cancel' }] });
+            }
+        }
+
+
+        // --- LINKS & BUTTONS LOGIK ---
+        async function loadLinks() {
+            const container = document.getElementById('button-container');
+            container.innerHTML = '';
+            try {
+                const res = await fetch(GIST_LINKS + "?t=" + Date.now());
+                const text = await res.text();
+                linksData = [];
+
+                text.split('\n').forEach(line => {
                     line = line.trim();
                     if (!line) return;
-
-                    const parts = line.split(';-;');
-                    if (parts.length < 2) return;
-
-                    let label = parts[0];
-                    let password = "";
-                    let linkPart = "";
-
-                    if (parts.length === 2) {
-                        linkPart = parts[1];
-                    } else if (parts.length >= 3) {
-                        password = parts[1];
-                        linkPart = parts[2];
-                    }
-
-                    let target = linkPart;
-                    let popupText = "";
                     
-                    const semicolonIndex = linkPart.indexOf(';');
-                    if (semicolonIndex !== -1) {
-                        target = linkPart.substring(0, semicolonIndex);
-                        popupText = linkPart.substring(semicolonIndex + 1);
-                    }
+                    // Fallback für altes Format falls vorhanden
+                    line = line.replace(/;-;/g, ';');
+                    
+                    let parts = line.split(';');
+                    let label = parts[0]?.trim();
+                    let pwd = (parts[1]?.trim()) || '-';
+                    let target = parts[2]?.trim() || '';
+                    let popupText = parts.slice(3).join(';')?.trim() || '';
+                    
+                    if (!label || !target) return;
+                    linksData.push({ label, password: pwd, target, popupText });
 
                     const btn = document.createElement('button');
                     btn.className = 'glass-btn';
                     btn.textContent = label;
-
                     if (target.toUpperCase() === 'X') {
                         btn.disabled = true;
                     } else {
-                        const isLink = target.toLowerCase().startsWith('http');
-                        
-                        btn.addEventListener('click', () => {
-                            handleButtonClick({
-                                label,
-                                password,
-                                target,
-                                popupText,
-                                isLink
-                            });
-                        });
+                        btn.onclick = () => handleLinkClick(label, pwd, target, popupText);
                     }
-
                     container.appendChild(btn);
                 });
-
-            } catch (error) {
-                container.innerHTML = '<p class="error-msg">Fehler beim Laden der Links. Bitte überprüfe die Internetverbindung oder den Gist-Link.</p>';
-                console.error(error);
+            } catch (e) {
+                container.innerHTML = '<p style="color:var(--danger); grid-column:1/-1; text-align:center;">Fehler beim Laden der Links.</p>';
             }
         }
 
-        loadLinks();
+        async function handleLinkClick(label, password, target, popupText) {
+            if (password !== '-' && password !== '') {
+                const input = await Dialog.open({
+                    title: 'Geschützt', text: `Passwort für "${label}" erforderlich:`,
+                    fields: [{ type: 'password', placeholder: 'Passwort' }],
+                    buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Entsperren', class: 'primary', action: 'ok' }]
+                });
+                if (input === null) return;
+                if (input !== password) {
+                    Dialog.open({ title: 'Abgelehnt', text: 'Falsches Passwort!', buttons: [{ text: 'Schließen', class: 'danger', action: 'cancel' }] });
+                    return;
+                }
+            }
+
+            const isLink = target.toLowerCase().startsWith('http');
+            if (isLink) {
+                if (popupText) {
+                    const proceed = await Dialog.open({
+                        title: label, text: popupText,
+                        buttons: [{ text: 'Abbrechen', action: 'cancel' }, { text: 'Weiter zum Link', class: 'primary', action: 'ok' }]
+                    });
+                    if (proceed) window.open(target, '_blank');
+                } else {
+                    window.open(target, '_blank');
+                }
+            } else {
+                Dialog.open({ title: label, text: target, buttons: [{ text: 'OK', class: 'primary', action: 'cancel' }] });
+            }
+        }
+
+        // --- EDITOR LOGIK ---
+        document.getElementById('btn-edit').onclick = showEditorList;
+        document.getElementById('btn-admin').onclick = () => {
+            Dialog.open({title: 'Admin Panel', text: 'Dieser Bereich ist noch in Entwicklung.', buttons: [{text:'OK', class:'primary', action:'cancel'}]});
+        };
+
+        function showEditorList() {
+            editorData = JSON.parse(JSON.stringify(linksData));
+            isDirty = false;
+            renderEditorList();
+        }
+
+        function renderEditorList() {
+            let html = '<div class="editor-list">';
+            editorData.forEach((l, i) => {
+                html += `<div class="editor-item">
+                            <span>${sanitizeHTML(l.label)}</span>
+                            <div class="editor-actions">
+                                <button class="icon-btn" onclick="editItem(${i})"><svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                <button class="icon-btn delete" onclick="deleteItem(${i})"><svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
+                            </div>
+                         </div>`;
+            });
+            html += '</div>';
+
+            Dialog.open({
+                title: 'Editor Modus', customClass: 'editor-mode', alignActions: 'right', customHTML: html,
+                buttons: [
+                    { text: 'Schließen', action: checkDirtyClose },
+                    { text: '+ Neuer Button', action: () => editItem(-1) },
+                    { text: 'Änderungen Speichern', class: 'primary', action: saveToGist }
+                ]
+            });
+        }
+
+        function editItem(index) {
+            const isNew = index === -1;
+            const item = isNew ? {label:'', password:'-', target:'', popupText:''} : editorData[index];
+            
+            Dialog.open({
+                title: isNew ? 'Neuer Button' : 'Button bearbeiten', customClass: 'editor-mode',
+                fields: [
+                    { label: 'Label *', value: item.label, placeholder: 'Name des Buttons' },
+                    { label: 'Passwort (optional, "-" für keins)', value: item.password, placeholder: '-' },
+                    { label: 'Link / Ziel * ("X" zum deaktivieren)', value: item.target, placeholder: 'https://...' },
+                    { label: 'Hinweis (Optionales Popup vor dem Link)', value: item.popupText, placeholder: 'Achtung: Externe Seite...' }
+                ],
+                buttons: [
+                    { text: 'Abbrechen', action: renderEditorList },
+                    { text: 'Übernehmen', class: 'primary', action: (dlg) => {
+                        const vals = dlg.inputs.querySelectorAll('input');
+                        const newLabel = sanitizeGistInput(vals[0].value);
+                        const newPwd = sanitizeGistInput(vals[1].value) || '-';
+                        const newTarget = sanitizeGistInput(vals[2].value);
+                        const newPopup = sanitizeGistInput(vals[3].value);
+                        
+                        if(!newLabel || !newTarget) {
+                            alert("Label und Link sind Pflichtfelder!"); return;
+                        }
+                        
+                        const newItem = { label: newLabel, password: newPwd, target: newTarget, popupText: newPopup };
+                        if (isNew) editorData.push(newItem);
+                        else editorData[index] = newItem;
+                        
+                        isDirty = true;
+                        renderEditorList();
+                    }}
+                ]
+            });
+        }
+
+        function deleteItem(index) {
+            editorData.splice(index, 1);
+            isDirty = true;
+            renderEditorList();
+        }
+
+        async function checkDirtyClose(dlg) {
+            if (!isDirty) { dlg.close(); return; }
+            const confirm = await Dialog.open({
+                title: 'Ungespeicherte Änderungen', text: 'Willst du wirklich schließen ohne zu speichern?',
+                buttons: [{ text: 'Zurück', action: 'cancel' }, { text: 'Nicht speichern', class: 'danger', action: 'ok' }]
+            });
+            if (confirm) {
+                isDirty = false;
+                Dialog.close();
+            } else {
+                renderEditorList(); // zurück zum editor
+            }
+        }
+
+        async function saveToGist(dlg) {
+            if (!isDirty) { dlg.close(); return; }
+            
+            let lines = editorData.map(l => {
+                let parts = [l.label, l.password, l.target];
+                if (l.popupText) parts.push(l.popupText);
+                return parts.join(';');
+            });
+            let rawText = lines.join('\n');
+            
+            // Formatierung für Pushcut: \n zu ~ und URL-Encoding für ; / : Leerzeichen
+            let payload = encodeURIComponent(rawText.replace(/\n/g, '~'));
+
+            try {
+                // Sende an Pushcut (Fire and forget, wir vertrauen dem API Call)
+                fetch(PUSHCUT_BASE + "9C-EDIT-APPLY&input=" + payload, { mode: 'no-cors' });
+                
+                dlg.close();
+                startLoadingBar();
+            } catch (e) {
+                alert("Fehler beim senden an Server");
+            }
+        }
+
+        function startLoadingBar() {
+            const loader = document.getElementById('loader');
+            const bar = document.getElementById('loader-bar');
+            loader.classList.add('active');
+            
+            // Trigger animation
+            setTimeout(() => { bar.style.width = '100%'; }, 50);
+
+            // Nach 3 Sekunden Seite neu laden
+            setTimeout(() => {
+                location.reload();
+            }, 3000);
+        }
+
     </script>
 </body>
 </html>
