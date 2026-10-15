@@ -361,7 +361,7 @@
         }
 
         function updateTabTitle() {
-            if(tabMode === 'away') { document.title = "9C |Efficiency Mode"; return; }
+            if(tabMode === 'away') { document.title = "9C | Efficiency Mode"; return; }
             if(tabMode === 'intro') {
                 document.title = introText[tabStep]; tabStep++;
                 if(tabStep >= introText.length) { tabMode = 'run'; tabStep = 0; }
