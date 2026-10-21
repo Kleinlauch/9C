@@ -9,17 +9,24 @@
     
     <style>
         :root {
-            var(--bg-dark): #050508;
+            --bg-dark: #050508;
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-border: rgba(255, 255, 255, 0.08);
             --glass-hover: rgba(255, 255, 255, 0.1);
             --accent-green: #39ff14;
             --accent-cyan: #00f0ff;
             --accent-purple: #bd00ff;
+            --accent-orange: #ffaa00;
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --danger: #ff0055;
         }
+
+        /* CUSTOM SCROLLBARS */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--accent-cyan); border-radius: 10px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background-color: var(--accent-purple); }
 
         body.lite-mode * { backdrop-filter: none !important; -webkit-backdrop-filter: none !important; box-shadow: none !important; transition: none !important; animation: none !important; }
         body.lite-mode { background: #0a0a0a !important; }
@@ -30,7 +37,7 @@
                 radial-gradient(circle at 10% 20%, rgba(57, 255, 20, 0.12), transparent 40%),
                 radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.12), transparent 40%),
                 radial-gradient(circle at 50% 50%, rgba(189, 0, 255, 0.08), transparent 60%),
-                #050508;
+                var(--bg-dark);
             background-size: cover; background-attachment: fixed;
             font-family: 'Quicksand', sans-serif; color: var(--text-main);
             display: flex; flex-direction: column; align-items: center;
@@ -39,7 +46,7 @@
         }
 
         .main-wrapper {
-            width: 100%; max-width: 1200px; display: flex; flex-direction: column; align-items: center; margin-top: 2rem;
+            width: 100%; max-width: 1600px; display: flex; flex-direction: column; align-items: center; margin-top: 2rem;
         }
 
         /* UHR */
@@ -52,10 +59,36 @@
         .digit { display: inline-block; width: 1.1em; text-align: center; position: relative; height: 1.1em; overflow: hidden; }
         .digit-inner { display: flex; flex-direction: column; transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); }
 
-        h1.title { font-size: 4rem; font-weight: 700; letter-spacing: 6px; margin: 0 0 2rem 0; text-align: center; color: white; text-shadow: 0 0 25px rgba(255,255,255,0.4); }
+        /* LOGO */
+        .main-logo { max-width: 100%; height: auto; max-height: 120px; margin-bottom: 2rem; filter: drop-shadow(0 0 15px rgba(255,255,255,0.2)); object-fit: contain; }
+
+        /* ALERT BOX */
+        .alert-box {
+            display: none; width: 100%; max-width: 800px; margin-bottom: 2.5rem;
+            background: rgba(255, 170, 0, 0.1); border: 2px solid var(--accent-orange);
+            border-radius: 16px; padding: 1.5rem; box-shadow: 0 0 25px rgba(255,170,0,0.2);
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;
+            animation: pulseAlert 3s infinite alternate;
+        }
+        @keyframes pulseAlert { from { box-shadow: 0 0 15px rgba(255,170,0,0.2); } to { box-shadow: 0 0 35px rgba(255,170,0,0.5); } }
+        .alert-title { color: var(--accent-orange); font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,170,0,0.4); text-transform: uppercase; letter-spacing: 1px;}
+        .alert-text { color: white; font-size: 1.1rem; line-height: 1.5; }
+
+        /* LOCK SCREEN OVERLAY */
+        #lock-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(5,5,8,0.98); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; color: white; padding: 2rem; box-sizing: border-box; transition: opacity 0.4s;
+            opacity: 0; visibility: hidden;
+        }
+        #lock-overlay.active { opacity: 1; visibility: visible; }
+        .lock-icon { font-size: 5rem; color: var(--danger); margin-bottom: 1.5rem; text-shadow: 0 0 30px var(--danger); }
+        .lock-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
+        .lock-text { font-size: 1.2rem; color: var(--text-muted); max-width: 600px; line-height: 1.6; }
 
         /* Schnellzugriff */
-        .qa-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; width: 100%; margin-bottom: 2rem; }
+        .qa-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; width: 100%; margin-bottom: 2rem; max-width: 1200px; }
         .qa-btn {
             background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
             border: 1px solid var(--glass-border); border-radius: 16px; padding: 1rem;
@@ -65,22 +98,39 @@
         }
         .qa-btn:hover { border-color: var(--accent-cyan); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,240,255,0.2); color: var(--accent-cyan); }
         .qa-btn img, .qa-btn svg { width: 32px; height: 32px; object-fit: contain; border-radius: 8px; }
-        .qa-info-btn {
-            position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-            width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1);
-            display: flex; justify-content: center; align-items: center; font-style: italic; transition: 0.2s; cursor: pointer; font-size: 14px;
-        }
+        .qa-info-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-style: italic; transition: 0.2s; cursor: pointer; font-size: 14px; }
         .qa-info-btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 15px var(--accent-cyan); }
 
-        .fancy-divider { width: 100%; height: 2px; border: none; margin: 1rem 0 3rem 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), var(--accent-cyan), var(--accent-purple), rgba(255,255,255,0.2), transparent); }
+        .fancy-divider { width: 100%; height: 2px; border: none; margin: 1rem 0 2.5rem 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), var(--accent-cyan), var(--accent-purple), rgba(255,255,255,0.2), transparent); max-width: 1200px; }
 
-        /* Dynamische Buttons */
-        #button-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.2rem; width: 100%; }
+        /* KATEGORIEN SYSTEM */
+        .categories-wrapper {
+            display: flex; overflow-x: auto; overflow-y: hidden; gap: 1.5rem; width: 100%;
+            padding: 0 10px 20px 10px; scroll-snap-type: x mandatory; scroll-behavior: smooth;
+        }
+        .category-col {
+            flex: 0 0 calc(16.666% - 1.25rem); /* Max 6 per screen on large Desktop */
+            min-width: 260px; /* Forces scrolling on smaller screens */
+            display: flex; flex-direction: column; gap: 1rem; scroll-snap-align: start;
+        }
+        .cat-header {
+            font-size: 1.3rem; font-weight: 700; color: white; border-bottom: 2px solid var(--glass-border);
+            padding-bottom: 0.5rem; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.2);
+            position: relative;
+        }
+        .cat-header::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 40px; height: 2px; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+
+        @media (max-width: 1700px) { .category-col { flex: 0 0 calc(20% - 1.2rem); } }
+        @media (max-width: 1400px) { .category-col { flex: 0 0 calc(25% - 1.125rem); } }
+        @media (max-width: 1100px) { .category-col { flex: 0 0 calc(33.333% - 1rem); } }
+        @media (max-width: 850px) { .category-col { flex: 0 0 calc(50% - 0.75rem); } }
+        @media (max-width: 550px) { .category-col { flex: 0 0 100%; min-width: 100%; } .categories-wrapper { gap: 1rem; padding-right: 0; } }
+
         .glass-btn {
-            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 18px;
-            padding: 1.4rem; color: var(--text-main); font-size: 1.15rem; font-family: 'Quicksand', sans-serif;
+            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px;
+            padding: 1.2rem; color: var(--text-main); font-size: 1.1rem; font-family: 'Quicksand', sans-serif;
             font-weight: 600; cursor: pointer; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden; word-wrap: break-word; outline: none;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden; word-wrap: break-word; outline: none; width: 100%; text-align: left;
         }
         .glass-btn:hover:not(:disabled) { background: var(--glass-hover); border-color: var(--accent-green); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(57,255,20,0.3); color: var(--accent-green); }
         .glass-btn:disabled { background: rgba(255,255,255,0.01); color: #444; cursor: not-allowed; border-color: transparent; box-shadow: none; }
@@ -93,14 +143,8 @@
         .footer-right { color: var(--accent-cyan); cursor: pointer; transition: 0.3s; }
         .footer-right:hover { color: var(--accent-purple); text-shadow: 0 0 10px var(--accent-purple); }
 
-        /* Changelog Bubble (PC) */
-        .cl-bubble {
-            position: fixed; bottom: 40px; left: 20px; width: 300px; background: rgba(10, 15, 20, 0.9);
-            border: 1px solid var(--accent-cyan); border-radius: 16px; padding: 1rem; color: white;
-            box-shadow: 0 10px 30px rgba(0,240,255,0.2); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            z-index: 2000; font-family: 'Quicksand', sans-serif; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            opacity: 0; transform: translateY(20px) scale(0.9); pointer-events: none;
-        }
+        /* Changelog Bubble */
+        .cl-bubble { position: fixed; bottom: 40px; left: 20px; width: 300px; background: rgba(10, 15, 20, 0.9); border: 1px solid var(--accent-cyan); border-radius: 16px; padding: 1rem; color: white; box-shadow: 0 10px 30px rgba(0,240,255,0.2); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; font-family: 'Quicksand', sans-serif; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; transform: translateY(20px) scale(0.9); pointer-events: none; }
         .cl-bubble.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .cl-bubble.fade-out { opacity: 0; transform: translateY(10px) scale(0.95); transition: opacity 0.8s ease, transform 0.8s ease; }
         .cl-bubble-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 700; color: var(--accent-cyan); }
@@ -115,7 +159,7 @@
         .menu-item span { display: none; margin-left: 10px; font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
         .menu-item:hover { background: var(--glass-hover); border-color: var(--accent-cyan); color: var(--accent-cyan); }
         
-        /* Modals */
+        /* Modals & Dialogs */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s ease; padding: 1rem; box-sizing: border-box; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-box { background: rgba(15, 15, 20, 0.9); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05); transform: translateY(20px) scale(0.95); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; max-height: 90vh; overflow-y: auto;}
@@ -153,30 +197,24 @@
         .osk-key.wide { flex: 2; } .osk-key.space { flex: 5; }
 
         @media (max-width: 768px) {
-            h1.title { font-size: 3rem; }
             .side-menu { top: auto; bottom: 0; left: 0; right: 0; flex-direction: row; justify-content: space-around; background: rgba(5,5,8,0.9); border-top: 1px solid var(--glass-border); padding: 10px; }
             .menu-item { flex-direction: column; background: transparent; border: none; box-shadow: none; padding: 5px; gap: 5px; }
             .menu-item span { display: block; font-size: 0.75rem; margin: 0; }
-            .footer { bottom: 70px; padding: 5px 15px; } /* Schiebt den Footer über die Mobile Navbar */
+            .footer { bottom: 70px; padding: 5px 15px; }
             body { padding-bottom: 120px; }
         }
-        @media (min-width: 769px) { .menu-item span { display: inline; } .qa-container { grid-template-columns: repeat(4, 1fr); } }
+        @media (min-width: 769px) { .menu-item span { display: inline; } }
     </style>
 </head>
 <body>
     <div id="toast" class="toast"></div>
 
-    <script>
-        // === KONFIGURATION ===
-        const CONFIG_VERSION = "V1.4 - Smart Tab Update";
-        const CONFIG_SERVER_INFO = "Server: S1: Windows 7 Ultimate + Windows 11 Home";
-        const CONFIG_CHANGELOG = "ON"; // ON oder OFF
-        const GIST_LINKS = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw";
-        const GIST_USERS = "https://gist.githubusercontent.com/Kleinlauch/6ccb29c799b9a8ef77998a16fec5dfbf/raw";
-        const GIST_CHANGELOG = "https://gist.githubusercontent.com/Kleinlauch/2dc67de9d874d23625ad8f4567f1055f/raw";
-        const PUSHCUT_BASE = "https://api.pushcut.io/loPBXSU7lmRjUzDvwnMUm/execute?shortcut=";
-        // =====================
-    </script>
+    <!-- LOCK SCREEN OVERLAY -->
+    <div id="lock-overlay">
+        <div class="lock-icon">🔒</div>
+        <div class="lock-title">Gesperrt</div>
+        <div class="lock-text">Die Webseite ist derzeit nicht Verfügbar.<br>Bitte wende dich an die zuständige Person.</div>
+    </div>
 
     <!-- Footer -->
     <div class="footer">
@@ -186,10 +224,7 @@
 
     <!-- Changelog Bubble -->
     <div class="cl-bubble" id="cl-bubble" onmouseenter="clearBubbleTimer()" onmouseleave="startBubbleTimer()">
-        <div class="cl-bubble-header">
-            <span>Das ist Neu:</span>
-            <span class="cl-bubble-close" onclick="closeBubble()">&times;</span>
-        </div>
+        <div class="cl-bubble-header"><span>Das ist Neu:</span><span class="cl-bubble-close" onclick="closeBubble()">&times;</span></div>
         <div class="cl-bubble-content" id="cl-bubble-text">Lädt...</div>
     </div>
 
@@ -234,7 +269,13 @@
             <div class="digit" id="s2"><div class="digit-inner"><span>0</span><span>0</span></div></div>
         </div>
 
-        <h1 class="title">9C</h1>
+        <img src="logo.png" class="main-logo" alt="9C Logo" onerror="this.style.display='none'">
+
+        <!-- ALERT BOX -->
+        <div id="alert-box" class="alert-box">
+            <div id="alert-title" class="alert-title"></div>
+            <div id="alert-text" class="alert-text"></div>
+        </div>
 
         <!-- Schnellzugriff -->
         <div class="qa-container">
@@ -259,7 +300,8 @@
 
         <hr class="fancy-divider">
 
-        <div id="button-container"></div>
+        <!-- DYNAMISCHE KATEGORIEN -->
+        <div id="categories-wrapper" class="categories-wrapper"></div>
     </div>
 
     <!-- Universal Modals -->
@@ -289,11 +331,23 @@
     <style>@keyframes syncMove { 0% {left:-50%;} 100% {left:100%;} }</style>
 
     <script>
+        // === KONFIGURATION ===
+        const CONFIG_VERSION = "V1.5 - Categories & Locks";
+        const CONFIG_SERVER_INFO = "Server Status: Online";
+        const CONFIG_CHANGELOG = "ON"; // ON oder OFF
+        const GIST_LINKS = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw";
+        const GIST_USERS = "https://gist.githubusercontent.com/Kleinlauch/6ccb29c799b9a8ef77998a16fec5dfbf/raw";
+        const GIST_CHANGELOG = "https://gist.githubusercontent.com/Kleinlauch/2dc67de9d874d23625ad8f4567f1055f/raw";
+        const PUSHCUT_BASE = "https://api.pushcut.io/loPBXSU7lmRjUzDvwnMUm/execute?shortcut=";
+        // =====================
+
         document.getElementById('lbl-version').textContent = CONFIG_VERSION;
         document.getElementById('lbl-server').textContent = CONFIG_SERVER_INFO;
         
         let currentUser = null, linksData = [], editorData = [], isDirty = false, activeInput = null;
         let changelogText = "Keine neuen Infos gefunden.";
+        let rawLine0 = 'enable', rawLine1 = '[!]'; // Default Gist Lines
+        let lastGistText = "";
 
         // --- OSK ---
         let shiftActive = false;
@@ -322,88 +376,65 @@
         const deleteCookie = n => document.cookie = `${n}=; max-age=0; path=/`;
         const sanitizeGist = s => s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t])).replace(/[;~\n\r]/g, ' ').trim();
 
-        // --- TAB-TITEL ENGINE (Stundenplaner) ---
-        let tabMode = 'intro'; // intro, run, away
-        let tabStep = 0;
-        let tabInterval;
-        let lastBlink = 0;
-
+        // --- TAB-TITEL ENGINE (Fix für Echtzeit und Inaktivität) ---
+        let tabMode = 'intro'; let tabStep = 0; let lastBlink = 0;
         const introText = ["{ Willkommen }", "{ Guten Tag }", "Loading..."];
         const days = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
         
         function getSchoolSlot(date) {
-            const h = date.getHours(), m = date.getMinutes(), d = date.getDay();
-            const min = h * 60 + m;
-            
-            // Check Klingeln (Genaue Minuten für Blink)
+            const h = date.getHours(), m = date.getMinutes(), d = date.getDay(), min = h * 60 + m;
             const klingelZeiten = [460, 505, 550, 570, 615, 620, 665, 680, 725, 730, 775]; 
-            const mitKlingel = [775, 835, 930]; // MS
+            const mitKlingel = [775, 835, 930]; 
             if(klingelZeiten.includes(min) || ((d===1||d===2||d===4) && mitKlingel.includes(min))) {
                 if(Date.now() - lastBlink > 60000) { lastBlink = Date.now(); return 'BLINK'; }
             }
-            if(min < 460) return 'WAIT'; // Vor 07:40
-            if(min < 505) return '1';
-            if(min < 550) return '2';
-            if(min < 570) return 'P1';
-            if(min < 615) return '3';
-            if(min < 620) return 'BRK1'; // 10:15 - 10:20
-            if(min < 665) return '4';
-            if(min < 680) return 'P2';
-            if(min < 725) return '5';
-            if(min < 730) return 'BRK2'; // 12:05 - 12:10
-            if(min < 775) return '6'; // Endet 12:55
-
-            if(d === 1 || d === 2 || d === 4) { // Mittagsschule (Mo, Di, Do)
-                if(min < 835) return 'MP'; // 12:55 - 13:55
-                if(min < 930) return 'MS'; // 13:55 - 15:30
-            }
-            return 'DONE'; // Nach der Schule
+            if(min < 460) return 'WAIT'; 
+            if(min < 505) return '1'; if(min < 550) return '2'; if(min < 570) return 'P1';
+            if(min < 615) return '3'; if(min < 620) return 'BRK1'; 
+            if(min < 665) return '4'; if(min < 680) return 'P2';
+            if(min < 725) return '5'; if(min < 730) return 'BRK2'; 
+            if(min < 775) return '6'; 
+            if(d === 1 || d === 2 || d === 4) { if(min < 835) return 'MP'; if(min < 930) return 'MS'; }
+            return 'DONE'; 
         }
 
         function updateTabTitle() {
-            if(tabMode === 'away') { document.title = "9C | Efficiency Mode"; return; }
             if(tabMode === 'intro') {
                 document.title = introText[tabStep]; tabStep++;
                 if(tabStep >= introText.length) { tabMode = 'run'; tabStep = 0; }
                 return;
             }
 
-            const now = new Date();
-            const slot = getSchoolSlot(now);
+            const now = new Date(); const slot = getSchoolSlot(now);
             
             if(slot === 'BLINK') { document.title = "■ ■ ■ KLINGELN ■ ■ ■"; return; }
-            if(slot === 'WAIT') {
-                document.title = tabStep % 2 === 0 ? "9C | Schulbeginn ausstehend" : "Was machst du hier???";
-                tabStep++; return;
-            }
-            if(slot === 'DONE' || now.getDay() === 0 || now.getDay() === 6) {
-                document.title = "Was machst du hier?"; return;
-            }
+            if(slot === 'WAIT') { document.title = tabStep % 2 === 0 ? "9C | Schulbeginn ausstehend" : "Was machst du hier???"; tabStep++; return; }
+            if(slot === 'DONE' || now.getDay() === 0 || now.getDay() === 6) { document.title = "Was machst du hier?"; return; }
+            
             if(slot.startsWith('BRK')) {
-                // Countdown berechnen. BRK1 endet 10:20 (620), BRK2 endet 12:10 (730)
                 let endMin = slot === 'BRK1' ? 620 : 730;
                 let msLeft = (endMin * 60000) - ((now.getHours()*60 + now.getMinutes())*60000 + now.getSeconds()*1000);
                 let m = Math.floor(msLeft / 60000).toString().padStart(2,'0');
                 let s = Math.floor((msLeft % 60000)/1000).toString().padStart(2,'0');
-                document.title = `9C | BRK | ${m}:${s}`;
-                return;
+                document.title = `9C | BRK | ${m}:${s}`; return;
             }
 
-            // Normaler Wechsel
-            const timeStr = [now.getHours(), now.getMinutes(), now.getSeconds()].map(n=>n.toString().padStart(2,'0')).join(':');
             const dateStr = `${days[now.getDay()]} ${now.getDate()}.${now.getMonth()+1}.`;
-            const texts = [`9C | ${slot} | ${dateStr}`, `9C | ${slot} | ${timeStr}`];
-            
+            // Echtzeit Auswertung der Funktionen in array
+            const texts = [
+                `9C | ${slot} | ${dateStr}`, 
+                () => { const n = new Date(); return `9C | ${slot} | ${[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>x.toString().padStart(2,'0')).join(':')}`; }
+            ];
             if(['MP','MS'].includes(slot)) texts.push(`9C | ${slot} | Mittagsschule`);
 
-            document.title = texts[tabStep % texts.length];
+            let currentItem = texts[tabStep % texts.length];
+            document.title = typeof currentItem === 'function' ? currentItem() : currentItem;
             tabStep++;
         }
         
-        tabInterval = setInterval(updateTabTitle, 2000);
-        window.addEventListener('blur', () => { tabMode = 'away'; updateTabTitle(); });
+        setInterval(updateTabTitle, 2000);
+        window.addEventListener('blur', () => { document.title = "Efficiency Mode"; setTimeout(()=>tabStep=0, 2000); });
         window.addEventListener('focus', () => { tabMode = 'run'; tabStep = 0; updateTabTitle(); });
-
 
         // --- UHR LOGIK ---
         function updateClock() {
@@ -462,7 +493,7 @@
         };
 
         // --- SCHNELLZUGRIFF ---
-        function showNCInfo() { Dialog.open({ title: 'Next Cloud Info', showClose: true, text: 'Auf dieser Seite meldest du dich mit deinen Zugangsdaten an, welche du auch für die Schul Computer verwendest. Danach kannst du auf deine Dateien zugreifen.', buttons: [{text: 'Weiter zu Next Cloud', class: 'primary', action: () => { Dialog.close(); window.open('https://nc.schillerschuledettingen.de/nextcloud/login', '_blank'); }}] }); }
+        function showNCInfo() { Dialog.open({ title: 'Next Cloud Info', showClose: true, text: 'Auf dieser Seite meldest du dich mit deinen Zugangsdaten an. Danach kannst du auf deine Dateien zugreifen.', buttons: [{text: 'Weiter zu Next Cloud', class: 'primary', action: () => { Dialog.close(); window.open('https://nc.schillerschuledettingen.de/nextcloud/login', '_blank'); }}] }); }
         
         function getOSInstructions() {
             let ua = navigator.userAgent;
@@ -475,14 +506,13 @@
         function showTaskcardsPopup() {
             Dialog.open({
                 title: 'Weiterleitung zu Taskcards', showClose: true,
-                text: `Du wirst im folgenden zu Taskcards weitergeleitet, im Passwort Feld musst du nur folgendes tun:<br><br><span style="color:var(--accent-cyan)">${getOSInstructions()}</span>`,
+                text: `Im Passwort Feld musst du nur folgendes tun:<br><br><span style="color:var(--accent-cyan)">${getOSInstructions()}</span>`,
                 buttons: [{text: 'Weiter zu Taskcards', class: 'primary', action: () => {
                     navigator.clipboard.writeText("9cEnglish2627").then(()=>{ Dialog.close(); window.open('https://www.taskcards.de/#/board/10eca93a-de74-456c-beaa-3841592ff1eb/view?token=75a6af1a-571e-47e7-bbc1-f26c6f9397c0', '_blank'); }).catch(()=>{alert("Fehler beim Kopieren.");});
                 }}]
             });
         }
 
-        // --- LEHRER POPUP (Clipboard bedingt expliziten Klick) ---
         function showTeacherPopup() {
             Dialog.open({
                 title: 'Hallo Frau Stephan!', showClose: false,
@@ -506,7 +536,6 @@
                 if(res.ok) changelogText = await res.text();
                 document.getElementById('cl-bubble-text').textContent = changelogText;
                 
-                // Show initially if on PC and no params
                 if(window.innerWidth > 768 && window.location.search === '') {
                     setTimeout(() => {
                         const b = document.getElementById('cl-bubble'); b.classList.add('show');
@@ -519,34 +548,24 @@
         function clearBubbleTimer() { clearTimeout(bubbleTimer); }
         function closeBubble() {
             const b = document.getElementById('cl-bubble');
-            if(b.classList.contains('show')) {
-                b.classList.add('fade-out');
-                setTimeout(() => { b.classList.remove('show'); b.classList.remove('fade-out'); }, 800);
-            }
+            if(b.classList.contains('show')) { b.classList.add('fade-out'); setTimeout(() => { b.classList.remove('show'); b.classList.remove('fade-out'); }, 800); }
         }
         function showChangelog() {
-            if(window.innerWidth <= 768) {
-                Dialog.open({title: 'Das ist Neu', showClose: true, text: `<div style="text-align:left; white-space:pre-wrap; font-size:0.9rem;">${changelogText}</div>`, buttons: []});
-            } else {
-                clearBubbleTimer();
-                document.getElementById('cl-bubble').classList.add('show');
-                document.getElementById('cl-bubble').classList.remove('fade-out');
-            }
+            if(window.innerWidth <= 768) { Dialog.open({title: 'Das ist Neu', showClose: true, text: `<div style="text-align:left; white-space:pre-wrap; font-size:0.9rem;">${changelogText}</div>`, buttons: []}); }
+            else { clearBubbleTimer(); document.getElementById('cl-bubble').classList.add('show'); document.getElementById('cl-bubble').classList.remove('fade-out'); }
         }
 
-
-        // --- INIT ---
+        // --- INIT & POLLING ---
         window.onload = () => {
             const up = new URLSearchParams(window.location.search);
             if (up.has('user') && up.has('password')) {
                 currentUser = up.get('user').toUpperCase(); setCookie('9c_user', currentUser, 7); showToast(`Angemeldet als: ${currentUser}`);
                 window.history.replaceState({}, document.title, window.location.pathname); updateMenu();
-            } else if (window.location.search.includes('st-tc')) {
-                showTeacherPopup();
-            } else {
-                const cUser = getCookie('9c_user'); if(cUser) { currentUser = cUser; showToast(`Angemeldet als: ${currentUser}`); updateMenu(); }
-            }
-            loadLinks(); loadChangelog();
+            } else if (window.location.search.includes('st-tc')) { showTeacherPopup(); } 
+            else { const cUser = getCookie('9c_user'); if(cUser) { currentUser = cUser; updateMenu(); } }
+            
+            pollGist(); setInterval(pollGist, 8000); // Check Gist every 8s
+            loadChangelog();
         };
 
         // --- AUTH & MENÜ ---
@@ -591,30 +610,86 @@
             document.getElementById('btn-user').style.color = currentUser ? 'var(--accent-cyan)' : 'white';
         }
 
-        // --- GIST SYNC ---
         async function triggerServerSync(shortcut, payload, cb) {
             document.getElementById('sync-overlay').classList.add('active');
             try { await fetch(PUSHCUT_BASE + shortcut + "&input=" + payload, {mode:'no-cors'});
-                setTimeout(()=>{ document.getElementById('sync-overlay').classList.remove('active'); setTimeout(cb,400); }, 1500); // Fake delay for animation
+                setTimeout(()=>{ document.getElementById('sync-overlay').classList.remove('active'); setTimeout(cb,400); }, 1500);
             } catch(e) { document.getElementById('sync-overlay').classList.remove('active'); alert("Server Error"); }
         }
 
-        // --- GIST LINKS LOAD ---
-        async function loadLinks() {
-            const cont = document.getElementById('button-container'); cont.innerHTML = '';
+        // --- GIST PARSING & KATEGORIEN ---
+        async function pollGist() {
             try {
-                const txt = await(await fetch(GIST_LINKS+"?t="+Date.now())).text(); linksData = [];
-                txt.split('\n').forEach(l=>{
-                    l=l.trim(); if(!l)return; let p=l.split(';-;'); if(p.length<2)return;
-                    let lbl=p[0].trim(), pwd='-', tFull='';
-                    if(p.length===2) tFull=p[1].trim(); else {pwd=p[1].trim()||'-'; tFull=p.slice(2).join(';-;').trim();}
-                    let tgt=tFull, pop=''; let s=tFull.indexOf(';'); if(s!==-1){tgt=tFull.substring(0,s); pop=tFull.substring(s+1);}
-                    linksData.push({label:lbl, password:pwd, target:tgt, popupText:pop});
-                    const b = document.createElement('button'); b.className='glass-btn'; b.textContent=lbl;
-                    if(tgt.toUpperCase()==='X') b.disabled=true; else b.onclick=()=>handleLinkClick(lbl,pwd,tgt,pop);
-                    cont.appendChild(b);
-                });
+                const txt = await(await fetch(GIST_LINKS+"?t="+Date.now())).text();
+                if(txt !== lastGistText) { lastGistText = txt; parseGistData(txt); }
             } catch(e){}
+        }
+
+        function parseGistData(txt) {
+            const lines = txt.split('\n');
+            if(lines.length < 2) return;
+            
+            rawLine0 = lines[0].trim();
+            rawLine1 = lines[1].trim();
+
+            // 1. Lock Screen Check
+            if(rawLine0.toLowerCase() === 'disable') document.getElementById('lock-overlay').classList.add('active');
+            else document.getElementById('lock-overlay').classList.remove('active');
+
+            // 2. Alert Box Check
+            const alertBox = document.getElementById('alert-box');
+            if(rawLine1.startsWith('[!]') && rawLine1.length > 3) {
+                const msg = rawLine1.substring(3).split(';');
+                document.getElementById('alert-title').textContent = msg[0];
+                document.getElementById('alert-text').textContent = msg.slice(1).join(';');
+                alertBox.style.display = 'block';
+            } else { alertBox.style.display = 'none'; }
+
+            // 3. Kategorien & Buttons
+            linksData = [];
+            let catMap = new Map();
+            let currentCat = "Allgemein";
+
+            for(let i=2; i<lines.length; i++) {
+                let l = lines[i].trim();
+                if(!l) continue;
+                if(l.startsWith('#')) {
+                    currentCat = l.substring(1).trim();
+                    if(!catMap.has(currentCat)) catMap.set(currentCat, []);
+                    continue;
+                }
+                
+                let p = l.split(';-;'); if(p.length < 2) continue;
+                let lbl=p[0].trim(), pwd='-', tFull='';
+                if(p.length===2) tFull=p[1].trim(); else {pwd=p[1].trim()||'-'; tFull=p.slice(2).join(';-;').trim();}
+                let tgt=tFull, pop=''; let s=tFull.indexOf(';'); if(s!==-1){tgt=tFull.substring(0,s); pop=tFull.substring(s+1);}
+                
+                let btnObj = {label:lbl, password:pwd, target:tgt, popupText:pop, category:currentCat};
+                linksData.push(btnObj);
+                
+                if(!catMap.has(currentCat)) catMap.set(currentCat, []);
+                catMap.get(currentCat).push(btnObj);
+            }
+            renderCategoriesUI(catMap);
+        }
+
+        function renderCategoriesUI(catMap) {
+            const wrapper = document.getElementById('categories-wrapper');
+            wrapper.innerHTML = '';
+            
+            catMap.forEach((buttons, catName) => {
+                const col = document.createElement('div'); col.className = 'category-col';
+                const header = document.createElement('div'); header.className = 'cat-header'; header.textContent = catName;
+                col.appendChild(header);
+                
+                buttons.forEach(b => {
+                    const btn = document.createElement('button'); btn.className = 'glass-btn'; btn.textContent = b.label;
+                    if(b.target.toUpperCase() === 'X') btn.disabled = true;
+                    else btn.onclick = () => handleLinkClick(b.label, b.password, b.target, b.popupText);
+                    col.appendChild(btn);
+                });
+                wrapper.appendChild(col);
+            });
         }
 
         async function handleLinkClick(lbl, pwd, tgt, pop) {
@@ -636,7 +711,7 @@
                 buttons:[{text:'Abbrechen',action:'cancel'},{text:'Speichern',class:'primary',action: dlg=>{
                     const v=dlg.inputs.querySelectorAll('input'); const l=sanitizeGist(v[0].value), p=sanitizeGist(v[1].value)||'-', t=sanitizeGist(v[2].value), h=sanitizeGist(v[3].value)||'-';
                     if(!l||!t){alert("Label/Link fehlen!");return;}
-                    Dialog.close(); triggerServerSync("9C-ADD", encodeURIComponent(`${l};${p};${t};${h}`), ()=>{ Dialog.open({title:'Erfolg',text:'Hinzugefügt.',buttons:[]}); setTimeout(()=>location.reload(),2000); });
+                    Dialog.close(); triggerServerSync("9C-ADD", encodeURIComponent(`${l};${p};${t};${h}`), ()=>{ Dialog.open({title:'Erfolg',text:'Hinzugefügt.',buttons:[]}); setTimeout(()=>pollGist(),2000); });
                 }}]
             });
         };
@@ -645,23 +720,29 @@
         function renderEditor() {
             let h = '<div class="editor-list">';
             editorData.forEach((l, i) => {
-                h += `<div class="editor-item"><span>${sanitizeGist(l.label)}</span>
-                        <div class="editor-actions">
-                            <button class="icon-btn" onclick="editItem(${i})"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
-                            <button class="icon-btn delete" onclick="deleteItem(${i})"><svg viewBox="0 0 24 24" width="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
-                        </div></div>`;
+                h += `<div class="editor-item" style="flex-direction:column; align-items:flex-start; gap:5px;">
+                        <span style="color:var(--accent-cyan); font-size:0.8rem;">Kat: ${sanitizeGist(l.category)}</span>
+                        <div style="display:flex; justify-content:space-between; width:100%;">
+                            <span>${sanitizeGist(l.label)}</span>
+                            <div class="editor-actions">
+                                <button class="icon-btn" onclick="editItem(${i})"><svg viewBox="0 0 24 24" width="18" stroke="currentColor" fill="none" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                <button class="icon-btn delete" onclick="deleteItem(${i})"><svg viewBox="0 0 24 24" width="18" stroke="currentColor" fill="none" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2M10 11v6M14 11v6"/></svg></button>
+                            </div>
+                        </div>
+                      </div>`;
             }); h += '</div>';
             Dialog.open({ title: 'Editor', customClass: 'editor-mode', customHTML: h, buttons: [ { text: 'Schließen', action: checkDirtyClose }, { text: '+ Neu', action: () => editItem(-1) }, { text: 'Speichern', class: 'primary', action: saveGist } ] });
         }
         function editItem(i) {
-            const isN = i===-1; const it = isN ? {label:'',password:'-',target:'',popupText:''} : editorData[i];
+            const isN = i===-1; const it = isN ? {label:'',password:'-',target:'',popupText:'',category:'Allgemein'} : editorData[i];
             Dialog.open({
                 title: isN ? 'Neu' : 'Bearbeiten', customClass: 'editor-mode',
-                fields: [{label:'Label*',value:it.label}, {label:'Passwort (- = keins)',value:it.password}, {label:'Link (X = aus)*',value:it.target}, {label:'Hinweis (- = keins)',value:it.popupText||'-'}],
+                fields: [{label:'Kategorie*',value:it.category}, {label:'Label*',value:it.label}, {label:'Passwort (- = keins)',value:it.password}, {label:'Link (X = aus)*',value:it.target}, {label:'Hinweis (- = keins)',value:it.popupText||'-'}],
                 buttons: [{text:'Abbrechen',action:renderEditor}, {text:'Übernehmen',class:'primary',action:dlg=>{
-                    const v=dlg.inputs.querySelectorAll('input'); const nL=sanitizeGist(v[0].value), nP=sanitizeGist(v[1].value)||'-', nT=sanitizeGist(v[2].value), nU=sanitizeGist(v[3].value)==='-'?'':sanitizeGist(v[3].value);
-                    if(!nL||!nT) {alert("Label/Link!");return;}
-                    isN ? editorData.push({label:nL,password:nP,target:nT,popupText:nU}) : editorData[i]={label:nL,password:nP,target:nT,popupText:nU};
+                    const v=dlg.inputs.querySelectorAll('input'); 
+                    const nC=sanitizeGist(v[0].value), nL=sanitizeGist(v[1].value), nP=sanitizeGist(v[2].value)||'-', nT=sanitizeGist(v[3].value), nU=sanitizeGist(v[4].value)==='-'?'':sanitizeGist(v[4].value);
+                    if(!nL||!nT||!nC) {alert("Kategorie/Label/Link Pflicht!");return;}
+                    isN ? editorData.push({label:nL,password:nP,target:nT,popupText:nU,category:nC}) : editorData[i]={label:nL,password:nP,target:nT,popupText:nU,category:nC};
                     isDirty=true; renderEditor();
                 }}]
             });
@@ -674,10 +755,21 @@
         }
         function saveGist(dlg) {
             if(!isDirty){dlg.close();return;}
-            let ls = editorData.map(l => l.password!=='-'&&l.password!=='' ? `${l.label};-;\${l.password};-;\${l.target}${l.popupText?';'+l.popupText:''}` : `${l.label};-;\${l.target}${l.popupText?';'+l.popupText:''}`);
-            Dialog.close(); triggerServerSync("9C-EDIT-APPLY", encodeURIComponent(ls.join('\n')), ()=>location.reload());
+            
+            // Rebuild Gist Formatted String
+            let grouped = {};
+            editorData.forEach(l => { if(!grouped[l.category]) grouped[l.category]=[]; grouped[l.category].push(l); });
+            
+            let ls = [rawLine0, rawLine1]; // Keep Status and Alert config
+            for(let cat in grouped) {
+                ls.push(`#${cat}`);
+                grouped[cat].forEach(l => {
+                    ls.push(l.password!=='-'&&l.password!=='' ? `${l.label};-;\${l.password};-;\${l.target}${l.popupText?';'+l.popupText:''}` : `${l.label};-;\${l.target}${l.popupText?';'+l.popupText:''}`);
+                });
+            }
+            
+            Dialog.close(); triggerServerSync("9C-EDIT-APPLY", encodeURIComponent(ls.join('\n')), ()=> { lastGistText = ""; pollGist(); });
         }
-
     </script>
 </body>
 </html>
