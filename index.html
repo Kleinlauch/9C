@@ -10,9 +10,6 @@
     <style>
         :root {
             --bg-dark: #050508;
-            --glass-bg: rgba(255, 255, 255, 0.03);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-hover: rgba(255, 255, 255, 0.1);
             --accent-green: #39ff14;
             --accent-cyan: #00f0ff;
             --accent-purple: #bd00ff;
@@ -20,6 +17,14 @@
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --danger: #ff0055;
+
+            /* True Glassmorphism Variables */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-bg-hover: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --glass-edge-light: rgba(255, 255, 255, 0.15);
+            --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            --glass-blur: blur(16px) saturate(180%);
         }
 
         /* CUSTOM SCROLLBARS */
@@ -34,9 +39,9 @@
         body {
             margin: 0; padding: 0 1.5rem 5rem 1.5rem; min-height: 100vh; width: 100vw;
             background: 
-                radial-gradient(circle at 10% 20%, rgba(57, 255, 20, 0.12), transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.12), transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(189, 0, 255, 0.08), transparent 60%),
+                radial-gradient(circle at 15% 30%, rgba(57, 255, 20, 0.18), transparent 50%),
+                radial-gradient(circle at 85% 70%, rgba(0, 240, 255, 0.18), transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(189, 0, 255, 0.12), transparent 65%),
                 var(--bg-dark);
             background-size: cover; background-attachment: fixed;
             font-family: 'Quicksand', sans-serif; color: var(--text-main);
@@ -62,62 +67,76 @@
         /* LOGO */
         .main-logo { max-width: 100%; height: auto; max-height: 120px; margin-bottom: 2rem; filter: drop-shadow(0 0 15px rgba(255,255,255,0.2)); object-fit: contain; }
 
-        /* ALERT BOX */
+        /* ALERT BOX - Glass Effect */
         .alert-box {
             display: none; width: 100%; max-width: 800px; margin-bottom: 2.5rem;
-            background: rgba(255, 170, 0, 0.1); border: 2px solid var(--accent-orange);
-            border-radius: 16px; padding: 1.5rem; box-shadow: 0 0 25px rgba(255,170,0,0.2);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); text-align: center;
-            animation: pulseAlert 3s infinite alternate;
+            background: rgba(255, 170, 0, 0.05); 
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid rgba(255, 170, 0, 0.1);
+            border-top: 1px solid rgba(255, 170, 0, 0.3);
+            border-left: 1px solid rgba(255, 170, 0, 0.3);
+            border-radius: 20px; padding: 1.5rem; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            text-align: center; animation: pulseAlert 3s infinite alternate;
         }
-        @keyframes pulseAlert { from { box-shadow: 0 0 15px rgba(255,170,0,0.2); } to { box-shadow: 0 0 35px rgba(255,170,0,0.5); } }
+        @keyframes pulseAlert { 
+            from { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 0 15px rgba(255,170,0,0.1); } 
+            to { box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 0 0 35px rgba(255,170,0,0.3); } 
+        }
         .alert-title { color: var(--accent-orange); font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,170,0,0.4); text-transform: uppercase; letter-spacing: 1px;}
         .alert-text { color: white; font-size: 1.1rem; line-height: 1.5; }
 
-        /* LOCK SCREEN OVERLAY */
+        /* LOCK SCREEN OVERLAY - Heavy Glass */
         #lock-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(5,5,8,0.98); backdrop-filter: blur(30px); -webkit-backdrop-filter: blur(30px);
+            background: rgba(5, 5, 8, 0.4); 
+            backdrop-filter: blur(25px) saturate(120%); -webkit-backdrop-filter: blur(25px) saturate(120%);
             z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center;
             text-align: center; color: white; padding: 2rem; box-sizing: border-box; transition: opacity 0.4s;
             opacity: 0; visibility: hidden;
         }
         #lock-overlay.active { opacity: 1; visibility: visible; }
-        .lock-icon { font-size: 5rem; color: var(--danger); margin-bottom: 1.5rem; text-shadow: 0 0 30px var(--danger); }
+        .lock-icon { font-size: 5rem; color: var(--danger); margin-bottom: 1.5rem; filter: drop-shadow(0 0 20px var(--danger)); }
         .lock-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
         .lock-text { font-size: 1.2rem; color: var(--text-muted); max-width: 600px; line-height: 1.6; }
 
-        /* Schnellzugriff */
+        /* Schnellzugriff & Glass Buttons */
         .qa-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; width: 100%; margin-bottom: 2rem; max-width: 1200px; }
-        .qa-btn {
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.01));
-            border: 1px solid var(--glass-border); border-radius: 16px; padding: 1rem;
-            color: var(--text-main); font-size: 1.1rem; font-family: 'Quicksand', sans-serif; font-weight: 600;
-            cursor: pointer; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            transition: all 0.3s ease; display: flex; align-items: center; gap: 12px; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.2); overflow: hidden;
+        
+        .qa-btn, .glass-btn {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border); 
+            border-top: 1px solid var(--glass-edge-light);
+            border-left: 1px solid var(--glass-edge-light);
+            border-radius: 16px; 
+            color: var(--text-main); font-family: 'Quicksand', sans-serif; font-weight: 600;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
+            box-shadow: var(--glass-shadow); position: relative; overflow: hidden; outline: none;
         }
-        .qa-btn:hover { border-color: var(--accent-cyan); transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,240,255,0.2); color: var(--accent-cyan); }
+        .qa-btn { padding: 1rem; font-size: 1.1rem; display: flex; align-items: center; gap: 12px; }
+        .glass-btn { padding: 1.2rem; font-size: 1.1rem; width: 100%; text-align: left; word-wrap: break-word; }
+        
+        .qa-btn:hover, .glass-btn:hover:not(:disabled) { 
+            background: var(--glass-bg-hover); 
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px); 
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); 
+        }
+        
+        .qa-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .glass-btn:hover:not(:disabled) { border-color: var(--accent-green); color: var(--accent-green); }
+        
         .qa-btn img, .qa-btn svg { width: 32px; height: 32px; object-fit: contain; border-radius: 8px; }
-        .qa-info-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; justify-content: center; align-items: center; font-style: italic; transition: 0.2s; cursor: pointer; font-size: 14px; }
-        .qa-info-btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 15px var(--accent-cyan); }
+        .qa-info-btn { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; font-style: italic; transition: 0.2s; cursor: pointer; font-size: 14px; }
+        .qa-info-btn:hover { background: var(--accent-cyan); color: #000; box-shadow: 0 0 15px var(--accent-cyan); border-color: var(--accent-cyan); }
+        .glass-btn:disabled { background: rgba(255,255,255,0.01); color: #444; cursor: not-allowed; border-color: transparent; box-shadow: none; backdrop-filter: none; }
 
         .fancy-divider { width: 100%; height: 2px; border: none; margin: 1rem 0 2.5rem 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), var(--accent-cyan), var(--accent-purple), rgba(255,255,255,0.2), transparent); max-width: 1200px; }
 
         /* KATEGORIEN SYSTEM */
-        .categories-wrapper {
-            display: flex; overflow-x: auto; overflow-y: hidden; gap: 1.5rem; width: 100%;
-            padding: 0 10px 20px 10px; scroll-snap-type: x mandatory; scroll-behavior: smooth;
-        }
-        .category-col {
-            flex: 0 0 calc(16.666% - 1.25rem); /* Max 6 per screen on large Desktop */
-            min-width: 260px; /* Forces scrolling on smaller screens */
-            display: flex; flex-direction: column; gap: 1rem; scroll-snap-align: start;
-        }
-        .cat-header {
-            font-size: 1.3rem; font-weight: 700; color: white; border-bottom: 2px solid var(--glass-border);
-            padding-bottom: 0.5rem; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.2);
-            position: relative;
-        }
+        .categories-wrapper { display: flex; overflow-x: auto; overflow-y: hidden; gap: 1.5rem; width: 100%; padding: 0 10px 20px 10px; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        .category-col { flex: 0 0 calc(16.666% - 1.25rem); min-width: 260px; display: flex; flex-direction: column; gap: 1rem; scroll-snap-align: start; }
+        .cat-header { font-size: 1.3rem; font-weight: 700; color: white; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.2); position: relative; }
         .cat-header::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 40px; height: 2px; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
 
         @media (max-width: 1700px) { .category-col { flex: 0 0 calc(20% - 1.2rem); } }
@@ -125,15 +144,6 @@
         @media (max-width: 1100px) { .category-col { flex: 0 0 calc(33.333% - 1rem); } }
         @media (max-width: 850px) { .category-col { flex: 0 0 calc(50% - 0.75rem); } }
         @media (max-width: 550px) { .category-col { flex: 0 0 100%; min-width: 100%; } .categories-wrapper { gap: 1rem; padding-right: 0; } }
-
-        .glass-btn {
-            background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 16px;
-            padding: 1.2rem; color: var(--text-main); font-size: 1.1rem; font-family: 'Quicksand', sans-serif;
-            font-weight: 600; cursor: pointer; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3); position: relative; overflow: hidden; word-wrap: break-word; outline: none; width: 100%; text-align: left;
-        }
-        .glass-btn:hover:not(:disabled) { background: var(--glass-hover); border-color: var(--accent-green); transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,0.4), 0 0 20px rgba(57,255,20,0.3); color: var(--accent-green); }
-        .glass-btn:disabled { background: rgba(255,255,255,0.01); color: #444; cursor: not-allowed; border-color: transparent; box-shadow: none; }
 
         /* Footer */
         .footer { position: fixed; bottom: 0; left: 0; width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; box-sizing: border-box; pointer-events: none; z-index: 50; }
@@ -143,8 +153,14 @@
         .footer-right { color: var(--accent-cyan); cursor: pointer; transition: 0.3s; }
         .footer-right:hover { color: var(--accent-purple); text-shadow: 0 0 10px var(--accent-purple); }
 
-        /* Changelog Bubble */
-        .cl-bubble { position: fixed; bottom: 40px; left: 20px; width: 300px; background: rgba(10, 15, 20, 0.9); border: 1px solid var(--accent-cyan); border-radius: 16px; padding: 1rem; color: white; box-shadow: 0 10px 30px rgba(0,240,255,0.2); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); z-index: 2000; font-family: 'Quicksand', sans-serif; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; transform: translateY(20px) scale(0.9); pointer-events: none; }
+        /* Changelog Bubble - Glass */
+        .cl-bubble { 
+            position: fixed; bottom: 40px; left: 20px; width: 300px; z-index: 2000;
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-edge-light); border-left: 1px solid var(--glass-edge-light);
+            border-radius: 20px; padding: 1rem; color: white; box-shadow: var(--glass-shadow); 
+            font-family: 'Quicksand', sans-serif; transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); opacity: 0; transform: translateY(20px) scale(0.9); pointer-events: none; 
+        }
         .cl-bubble.show { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; }
         .cl-bubble.fade-out { opacity: 0; transform: translateY(10px) scale(0.95); transition: opacity 0.8s ease, transform 0.8s ease; }
         .cl-bubble-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; font-weight: 700; color: var(--accent-cyan); }
@@ -152,53 +168,96 @@
         .cl-bubble-close:hover { color: var(--danger); }
         .cl-bubble-content { font-size: 0.9rem; color: var(--text-muted); max-height: 150px; overflow-y: auto; white-space: pre-wrap; }
 
-        /* Floating Menu */
+        /* Floating Menu - Glass */
         .side-menu { position: fixed; top: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 100; }
-        .menu-item { display: flex; align-items: center; background: rgba(10, 10, 15, 0.7); border: 1px solid var(--glass-border); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); padding: 12px; border-radius: 16px; cursor: pointer; color: white; transition: 0.3s; }
+        .menu-item { 
+            display: flex; align-items: center; padding: 12px; border-radius: 16px; cursor: pointer; color: white; transition: 0.3s; 
+            background: var(--glass-bg); backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border); border-top: 1px solid var(--glass-edge-light); border-left: 1px solid var(--glass-edge-light);
+            box-shadow: var(--glass-shadow);
+        }
         .menu-item svg { width: 22px; height: 22px; flex-shrink: 0; }
         .menu-item span { display: none; margin-left: 10px; font-weight: 600; font-size: 0.95rem; white-space: nowrap; }
-        .menu-item:hover { background: var(--glass-hover); border-color: var(--accent-cyan); color: var(--accent-cyan); }
+        .menu-item:hover { background: var(--glass-bg-hover); border-color: var(--accent-cyan); color: var(--accent-cyan); }
         
-        /* Modals & Dialogs */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s ease; padding: 1rem; box-sizing: border-box; }
+        /* Modals & Dialogs - Heavy Glass */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s ease; padding: 1rem; box-sizing: border-box; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
-        .modal-box { background: rgba(15, 15, 20, 0.9); border: 1px solid var(--glass-border); border-radius: 20px; padding: 2.5rem; width: 100%; max-width: 450px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 0 1px rgba(255,255,255,0.05); transform: translateY(20px) scale(0.95); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; max-height: 90vh; overflow-y: auto;}
+        .modal-box { 
+            background: rgba(255, 255, 255, 0.02); 
+            backdrop-filter: blur(24px) saturate(200%); -webkit-backdrop-filter: blur(24px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08); 
+            border-top: 1px solid rgba(255, 255, 255, 0.2); 
+            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 24px; padding: 2.5rem; width: 100%; max-width: 450px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+            transform: translateY(20px) scale(0.95); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; max-height: 90vh; overflow-y: auto;
+        }
         .modal-overlay.active .modal-box { transform: translateY(0) scale(1); }
         .modal-box.editor-mode { max-width: 800px; text-align: left; }
-        .close-x { position: absolute; top: 15px; right: 15px; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-muted); border-radius: 50%; transition: 0.2s; font-size: 1.2rem; font-weight: bold; }
-        .close-x:hover { background: rgba(255,255,255,0.1); color: white; }
-        .modal-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1rem; color: white; }
-        .modal-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; color: var(--text-muted); }
-        .modal-input { width: 100%; padding: 14px 16px; background: rgba(0,0,0,0.6); margin-bottom: 1rem; border: 1px solid var(--glass-border); border-radius: 12px; color: white; font-size: 1.1rem; font-family: 'Quicksand', sans-serif; outline: none; transition: 0.3s; box-sizing: border-box;}
-        .modal-input:focus { border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(189,0,255,0.3); }
+        .close-x { position: absolute; top: 15px; right: 15px; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; color: var(--text-muted); border-radius: 50%; transition: 0.2s; font-size: 1.2rem; font-weight: bold; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); }
+        .close-x:hover { background: rgba(255,255,255,0.15); color: white; }
+        .modal-title { font-size: 1.6rem; font-weight: 700; margin-bottom: 1rem; color: white; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .modal-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; color: var(--text-main); }
+        
+        /* Modal Inputs - Inset Glass */
+        .modal-input { 
+            width: 100%; padding: 14px 16px; margin-bottom: 1rem; border-radius: 12px; color: white; font-size: 1.1rem; font-family: 'Quicksand', sans-serif; outline: none; box-sizing: border-box; transition: 0.3s;
+            background: rgba(0, 0, 0, 0.25); 
+            border: 1px solid rgba(255, 255, 255, 0.1); 
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .modal-input:focus { background: rgba(0, 0, 0, 0.4); border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(189,0,255,0.3), inset 0 2px 5px rgba(0,0,0,0.3); }
+        
         .modal-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
         .modal-actions.right { justify-content: flex-end; }
-        .modal-btn { background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 1.05rem; font-family: 'Quicksand', sans-serif; font-weight: 700; transition: 0.2s; flex: 1; min-width: 120px; }
-        .modal-btn:hover { background: rgba(255,255,255,0.1); }
-        .modal-btn.primary { background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan); box-shadow: 0 0 15px rgba(0,240,255,0.4); }
-        .modal-btn.primary:hover { background: #fff; box-shadow: 0 0 25px rgba(0,240,255,0.6); }
+        
+        /* Modal Buttons - Glass */
+        .modal-btn { 
+            padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 1.05rem; font-family: 'Quicksand', sans-serif; font-weight: 700; transition: 0.2s; flex: 1; min-width: 120px;
+            background: rgba(255, 255, 255, 0.05); 
+            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.2);
+            color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .modal-btn:hover { background: rgba(255, 255, 255, 0.15); }
+        .modal-btn.primary { background: rgba(0, 240, 255, 0.15); color: #ffffff; border-color: var(--accent-cyan); text-shadow: 0 0 5px rgba(0,0,0,0.5); }
+        .modal-btn.primary:hover { background: rgba(0, 240, 255, 0.3); box-shadow: 0 0 25px rgba(0,240,255,0.5); }
+        .modal-btn.danger { background: rgba(255, 0, 85, 0.15); color: #ffffff; border-color: var(--danger); }
+        .modal-btn.danger:hover { background: rgba(255, 0, 85, 0.3); box-shadow: 0 0 25px rgba(255,0,85,0.5); }
 
-        /* Editor Liste */
+        /* Editor Liste - Glass Items */
         .editor-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; }
-        .editor-item { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.4); padding: 0.8rem 1.2rem; border-radius: 12px; border: 1px solid var(--glass-border); }
+        .editor-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1.2rem; border-radius: 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
         .editor-item span { font-weight: 600; font-size: 1rem; word-break: break-all; margin-right: 10px;}
         .editor-actions { display: flex; gap: 0.5rem; flex-shrink: 0;}
-        .icon-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s;}
-        .icon-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+        .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s; backdrop-filter: blur(5px); }
+        .icon-btn:hover { background: rgba(255,255,255,0.2); }
         
-        .toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); background: rgba(10,10,15,0.95); border: 1px solid var(--accent-purple); color: #fff; padding: 12px 24px; border-radius: 30px; font-weight: 700; box-shadow: 0 5px 25px rgba(189,0,255,0.4); transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 2000; white-space: nowrap; }
+        /* Toast - Glass */
+        .toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 30px; font-weight: 700; transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 2000; white-space: nowrap; 
+            background: rgba(20, 15, 30, 0.5); backdrop-filter: blur(15px) saturate(200%); -webkit-backdrop-filter: blur(15px) saturate(200%);
+            border: 1px solid rgba(189, 0, 255, 0.5); border-top: 1px solid rgba(189, 0, 255, 0.8);
+            color: #fff; box-shadow: 0 10px 30px rgba(189,0,255,0.3); }
         .toast.show { top: 20px; }
 
-        .osk { position: fixed; bottom: -300px; left: 0; width: 100vw; background: rgba(10,15,20,0.95); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid var(--glass-border); padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 3000; }
+        /* OSK Keyboard - Bottom Glass Panel */
+        .osk { position: fixed; bottom: -300px; left: 0; width: 100vw; padding: 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; transition: bottom 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); z-index: 3000; 
+            background: rgba(5, 5, 10, 0.4); backdrop-filter: blur(25px) saturate(200%); -webkit-backdrop-filter: blur(25px) saturate(200%);
+            border-top: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 -10px 40px rgba(0,0,0,0.5); }
         .osk.active { bottom: 0; }
         .osk-row { display: flex; justify-content: center; gap: 8px; }
-        .osk-key { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.05); color: white; border-radius: 8px; padding: 12px; font-size: 1.2rem; cursor: pointer; flex: 1; text-align: center; font-weight: 600; }
-        .osk-key:active { background: var(--accent-cyan); color: #000; }
+        .osk-key { 
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.2); 
+            color: white; border-radius: 10px; padding: 12px; font-size: 1.2rem; cursor: pointer; flex: 1; text-align: center; font-weight: 600; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2); transition: 0.1s; }
+        .osk-key:active { background: rgba(255, 255, 255, 0.2); transform: scale(0.95); }
         .osk-key.wide { flex: 2; } .osk-key.space { flex: 5; }
 
         @media (max-width: 768px) {
-            .side-menu { top: auto; bottom: 0; left: 0; right: 0; flex-direction: row; justify-content: space-around; background: rgba(5,5,8,0.9); border-top: 1px solid var(--glass-border); padding: 10px; }
-            .menu-item { flex-direction: column; background: transparent; border: none; box-shadow: none; padding: 5px; gap: 5px; }
+            .side-menu { top: auto; bottom: 0; left: 0; right: 0; flex-direction: row; justify-content: space-around; background: rgba(10,10,15,0.6); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-top: 1px solid rgba(255,255,255,0.1); padding: 10px; gap: 0; }
+            .menu-item { flex-direction: column; background: transparent; border: none; box-shadow: none; padding: 5px; gap: 5px; backdrop-filter: none; -webkit-backdrop-filter: none; }
             .menu-item span { display: block; font-size: 0.75rem; margin: 0; }
             .footer { bottom: 70px; padding: 5px 15px; }
             body { padding-bottom: 120px; }
@@ -211,7 +270,9 @@
 
     <!-- LOCK SCREEN OVERLAY -->
     <div id="lock-overlay">
-        <div class="lock-icon">🔒</div>
+        <div class="lock-icon">
+            <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
         <div class="lock-title">Gesperrt</div>
         <div class="lock-text">Die Webseite ist derzeit nicht Verfügbar.<br>Bitte wende dich an die zuständige Person.</div>
     </div>
@@ -253,8 +314,8 @@
         <div class="osk-row"><div class="osk-key" onclick="typeKey('1')">1</div><div class="osk-key" onclick="typeKey('2')">2</div><div class="osk-key" onclick="typeKey('3')">3</div><div class="osk-key" onclick="typeKey('4')">4</div><div class="osk-key" onclick="typeKey('5')">5</div><div class="osk-key" onclick="typeKey('6')">6</div><div class="osk-key" onclick="typeKey('7')">7</div><div class="osk-key" onclick="typeKey('8')">8</div><div class="osk-key" onclick="typeKey('9')">9</div><div class="osk-key" onclick="typeKey('0')">0</div></div>
         <div class="osk-row"><div class="osk-key" onclick="typeKey('q')">Q</div><div class="osk-key" onclick="typeKey('w')">W</div><div class="osk-key" onclick="typeKey('e')">E</div><div class="osk-key" onclick="typeKey('r')">R</div><div class="osk-key" onclick="typeKey('t')">T</div><div class="osk-key" onclick="typeKey('z')">Z</div><div class="osk-key" onclick="typeKey('u')">U</div><div class="osk-key" onclick="typeKey('i')">I</div><div class="osk-key" onclick="typeKey('o')">O</div><div class="osk-key" onclick="typeKey('p')">P</div></div>
         <div class="osk-row"><div class="osk-key" onclick="typeKey('a')">A</div><div class="osk-key" onclick="typeKey('s')">S</div><div class="osk-key" onclick="typeKey('d')">D</div><div class="osk-key" onclick="typeKey('f')">F</div><div class="osk-key" onclick="typeKey('g')">G</div><div class="osk-key" onclick="typeKey('h')">H</div><div class="osk-key" onclick="typeKey('j')">J</div><div class="osk-key" onclick="typeKey('k')">K</div><div class="osk-key" onclick="typeKey('l')">L</div></div>
-        <div class="osk-row"><div class="osk-key wide" onclick="typeKey('Shift')">⇧</div><div class="osk-key" onclick="typeKey('y')">Y</div><div class="osk-key" onclick="typeKey('x')">X</div><div class="osk-key" onclick="typeKey('c')">C</div><div class="osk-key" onclick="typeKey('v')">V</div><div class="osk-key" onclick="typeKey('b')">B</div><div class="osk-key" onclick="typeKey('n')">N</div><div class="osk-key" onclick="typeKey('m')">M</div><div class="osk-key wide" onclick="typeKey('Backspace')">⌫</div></div>
-        <div class="osk-row"><div class="osk-key wide" onclick="document.getElementById('osk').classList.remove('active')">Schließen</div><div class="osk-key space" onclick="typeKey(' ')">Leertaste</div><div class="osk-key wide" style="background:var(--accent-cyan);color:#000;" onclick="oskEnter()">Enter</div></div>
+        <div class="osk-row"><div class="osk-key wide" onclick="typeKey('Shift')">Shift</div><div class="osk-key" onclick="typeKey('y')">Y</div><div class="osk-key" onclick="typeKey('x')">X</div><div class="osk-key" onclick="typeKey('c')">C</div><div class="osk-key" onclick="typeKey('v')">V</div><div class="osk-key" onclick="typeKey('b')">B</div><div class="osk-key" onclick="typeKey('n')">N</div><div class="osk-key" onclick="typeKey('m')">M</div><div class="osk-key wide" onclick="typeKey('Backspace')">⌫</div></div>
+        <div class="osk-row"><div class="osk-key wide" onclick="document.getElementById('osk').classList.remove('active')">Schließen</div><div class="osk-key space" onclick="typeKey(' ')">Leertaste</div><div class="osk-key wide" style="background:rgba(0, 240, 255, 0.2); border-color:var(--accent-cyan);" onclick="oskEnter()">Enter</div></div>
     </div>
 
     <div class="main-wrapper">
@@ -304,7 +365,7 @@
         <div id="categories-wrapper" class="categories-wrapper"></div>
     </div>
 
-    <!-- Universal Modals -->
+    <!-- Universal Modals - Glass Box -->
     <div id="dialog-overlay" class="modal-overlay">
         <div class="modal-box" id="dialog-box">
             <div class="close-x" id="dialog-close" style="display:none;">&times;</div>
@@ -317,7 +378,7 @@
 
     <!-- Server Sync -->
     <div id="sync-overlay" class="modal-overlay">
-        <div class="modal-box" style="background:rgba(5,5,8,0.95);">
+        <div class="modal-box" style="padding:3rem;">
             <div style="display:flex; justify-content:space-between; align-items:center; gap:20px;">
                 <svg viewBox="0 0 24 24" width="50" fill="none" stroke="var(--accent-cyan)" stroke-width="1.5"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
                 <div style="flex-grow:1; height:6px; background:rgba(255,255,255,0.1); border-radius:5px; overflow:hidden; position:relative;">
@@ -325,14 +386,14 @@
                 </div>
                 <svg viewBox="0 0 24 24" width="50" fill="none" stroke="var(--accent-green)" stroke-width="1.5"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><line x1="6" y1="6" x2="6.01" y2="6"/><line x1="6" y1="18" x2="6.01" y2="18"/></svg>
             </div>
-            <div style="margin-top:20px; font-weight:700; color:white;">Daten werden an den Server gesendet...</div>
+            <div style="margin-top:20px; font-weight:700; color:white; text-shadow:0 0 10px rgba(255,255,255,0.3);">Daten werden an den Server gesendet...</div>
         </div>
     </div>
     <style>@keyframes syncMove { 0% {left:-50%;} 100% {left:100%;} }</style>
 
     <script>
         // === KONFIGURATION ===
-        const CONFIG_VERSION = "V1.5 - Categories & Locks";
+        const CONFIG_VERSION = "V1.5 - Glass Update";
         const CONFIG_SERVER_INFO = "Server Status: Online";
         const CONFIG_CHANGELOG = "ON"; // ON oder OFF
         const GIST_LINKS = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw";
@@ -407,7 +468,7 @@
 
             const now = new Date(); const slot = getSchoolSlot(now);
             
-            if(slot === 'BLINK') { document.title = "■ ■ ■ KLINGELN ■ ■ ■"; return; }
+            if(slot === 'BLINK') { document.title = "--- KLINGELN ---"; return; }
             if(slot === 'WAIT') { document.title = tabStep % 2 === 0 ? "9C | Schulbeginn ausstehend" : "Was machst du hier???"; tabStep++; return; }
             if(slot === 'DONE' || now.getDay() === 0 || now.getDay() === 6) { document.title = "Was machst du hier?"; return; }
             
@@ -420,7 +481,6 @@
             }
 
             const dateStr = `${days[now.getDay()]} ${now.getDate()}.${now.getMonth()+1}.`;
-            // Echtzeit Auswertung der Funktionen in array
             const texts = [
                 `9C | ${slot} | ${dateStr}`, 
                 () => { const n = new Date(); return `9C | ${slot} | ${[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>x.toString().padStart(2,'0')).join(':')}`; }
@@ -468,7 +528,7 @@
                     if(cfg.showClose) { this.closeX.style.display = 'flex'; this.closeX.onclick = () => this.handleBtnClick('cancel'); } else this.closeX.style.display = 'none';
                     if (cfg.fields) {
                         cfg.fields.forEach((f, i) => {
-                            if(f.label) { let l = document.createElement('label'); l.textContent = f.label; l.style.color="var(--text-muted)"; l.style.display="block"; l.style.marginBottom="5px"; this.inputs.appendChild(l); }
+                            if(f.label) { let l = document.createElement('label'); l.textContent = f.label; l.style.color="var(--text-muted)"; l.style.display="block"; l.style.marginBottom="5px"; l.style.textAlign="left"; this.inputs.appendChild(l); }
                             let inp = document.createElement('input'); inp.type = f.type || 'text'; inp.className = 'modal-input'; inp.placeholder = f.placeholder || ''; inp.value = f.value || '';
                             inp.addEventListener('keypress', (e) => { if(e.key === 'Enter') { e.preventDefault(); this.submit(cfg.buttons); } });
                             this.inputs.appendChild(inp); if (i === 0) setTimeout(() => inp.focus(), 50);
@@ -564,7 +624,7 @@
             } else if (window.location.search.includes('st-tc')) { showTeacherPopup(); } 
             else { const cUser = getCookie('9c_user'); if(cUser) { currentUser = cUser; updateMenu(); } }
             
-            pollGist(); setInterval(pollGist, 8000); // Check Gist every 8s
+            pollGist(); setInterval(pollGist, 8000);
             loadChangelog();
         };
 
@@ -632,11 +692,9 @@
             rawLine0 = lines[0].trim();
             rawLine1 = lines[1].trim();
 
-            // 1. Lock Screen Check
             if(rawLine0.toLowerCase() === 'disable') document.getElementById('lock-overlay').classList.add('active');
             else document.getElementById('lock-overlay').classList.remove('active');
 
-            // 2. Alert Box Check
             const alertBox = document.getElementById('alert-box');
             if(rawLine1.startsWith('[!]') && rawLine1.length > 3) {
                 const msg = rawLine1.substring(3).split(';');
@@ -645,7 +703,6 @@
                 alertBox.style.display = 'block';
             } else { alertBox.style.display = 'none'; }
 
-            // 3. Kategorien & Buttons
             linksData = [];
             let catMap = new Map();
             let currentCat = "Allgemein";
@@ -755,12 +812,10 @@
         }
         function saveGist(dlg) {
             if(!isDirty){dlg.close();return;}
-            
-            // Rebuild Gist Formatted String
             let grouped = {};
             editorData.forEach(l => { if(!grouped[l.category]) grouped[l.category]=[]; grouped[l.category].push(l); });
             
-            let ls = [rawLine0, rawLine1]; // Keep Status and Alert config
+            let ls = [rawLine0, rawLine1];
             for(let cat in grouped) {
                 ls.push(`#${cat}`);
                 grouped[cat].forEach(l => {
