@@ -6,6 +6,8 @@
     <title>9C</title>
     <link rel="icon" type="image/x-icon" href="https://raw.githubusercontent.com/Kleinlauch/9C/main/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- QR Code Generator Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
         :root {
@@ -85,7 +87,41 @@
         .alert-title { color: var(--accent-orange); font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,170,0,0.4); text-transform: uppercase; letter-spacing: 1px;}
         .alert-text { color: white; font-size: 1.1rem; line-height: 1.5; }
 
-        /* LOCK SCREEN OVERLAY - Heavy Glass */
+        /* FULL WHITE FLASH ANIMATION */
+        #flash-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #ffffff; z-index: 99999; opacity: 0; pointer-events: none; visibility: hidden;
+        }
+        #flash-overlay.flash-active { visibility: visible; animation: strobeFlash 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        @keyframes strobeFlash {
+            0% { opacity: 0; } 15% { opacity: 1; } 30% { opacity: 0; }
+            45% { opacity: 1; } 60% { opacity: 0; } 75% { opacity: 1; } 100% { opacity: 0; }
+        }
+
+        /* GLOBAL LOCK SCREEN - Security */
+        #global-lock-overlay {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(5, 5, 8, 0.85); 
+            backdrop-filter: blur(40px) saturate(150%); -webkit-backdrop-filter: blur(40px) saturate(150%);
+            z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            text-align: center; color: white; padding: 2rem; box-sizing: border-box; transition: opacity 0.4s;
+            opacity: 0; visibility: hidden;
+        }
+        #global-lock-overlay.active { opacity: 1; visibility: visible; }
+        .global-lock-icon { font-size: 5rem; color: var(--danger); margin-bottom: 1.5rem; filter: drop-shadow(0 0 40px var(--danger)); }
+        
+        /* AUTH PIN SYSTEM */
+        #auth-pin-container {
+            display: none; flex-direction: column; align-items: center; margin-top: 2rem;
+            background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);
+        }
+        #auth-pin-container.active { display: flex; }
+        .auth-pin-number { font-size: 3rem; font-weight: 700; letter-spacing: 8px; color: var(--accent-cyan); margin-bottom: 1rem; text-shadow: 0 0 20px var(--accent-cyan);}
+        #qrcode { background: white; padding: 10px; border-radius: 10px; margin-bottom: 1rem; box-shadow: 0 0 20px rgba(0,240,255,0.2);}
+        .auth-scanning-text { font-size: 0.9rem; color: var(--text-muted); animation: pulseText 1.5s infinite; }
+        @keyframes pulseText { 0% { opacity: 0.5; } 50% { opacity: 1; color: var(--accent-cyan); } 100% { opacity: 0.5; } }
+
+        /* REGULAR LOCK SCREEN OVERLAY (Gist Disable) */
         #lock-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background: rgba(5, 5, 8, 0.4); 
@@ -95,9 +131,6 @@
             opacity: 0; visibility: hidden;
         }
         #lock-overlay.active { opacity: 1; visibility: visible; }
-        .lock-icon { font-size: 5rem; color: var(--danger); margin-bottom: 1.5rem; filter: drop-shadow(0 0 20px var(--danger)); }
-        .lock-title { font-size: 2.5rem; font-weight: 700; margin-bottom: 1rem; }
-        .lock-text { font-size: 1.2rem; color: var(--text-muted); max-width: 600px; line-height: 1.6; }
 
         /* Schnellzugriff & Glass Buttons */
         .qa-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; width: 100%; margin-bottom: 2rem; max-width: 1200px; }
@@ -106,8 +139,7 @@
             background: var(--glass-bg);
             backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
             border: 1px solid var(--glass-border); 
-            border-top: 1px solid var(--glass-edge-light);
-            border-left: 1px solid var(--glass-edge-light);
+            border-top: 1px solid var(--glass-edge-light); border-left: 1px solid var(--glass-edge-light);
             border-radius: 16px; 
             color: var(--text-main); font-family: 'Quicksand', sans-serif; font-weight: 600;
             cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); 
@@ -117,12 +149,9 @@
         .glass-btn { padding: 1.2rem; font-size: 1.1rem; width: 100%; text-align: left; word-wrap: break-word; }
         
         .qa-btn:hover, .glass-btn:hover:not(:disabled) { 
-            background: var(--glass-bg-hover); 
-            border-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-4px); 
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); 
+            background: var(--glass-bg-hover); border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4); 
         }
-        
         .qa-btn:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
         .glass-btn:hover:not(:disabled) { border-color: var(--accent-green); color: var(--accent-green); }
         
@@ -133,17 +162,31 @@
 
         .fancy-divider { width: 100%; height: 2px; border: none; margin: 1rem 0 2.5rem 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), var(--accent-cyan), var(--accent-purple), rgba(255,255,255,0.2), transparent); max-width: 1200px; }
 
-        /* KATEGORIEN SYSTEM */
-        .categories-wrapper { display: flex; overflow-x: auto; overflow-y: hidden; gap: 1.5rem; width: 100%; padding: 0 10px 20px 10px; scroll-snap-type: x mandatory; scroll-behavior: smooth; }
+        /* KATEGORIEN & Wisch-Animation */
+        .categories-scroll-container { position: relative; width: 100%; max-width: 1600px; }
+        
+        .categories-wrapper { display: flex; overflow-x: auto; overflow-y: hidden; gap: 1.5rem; width: 100%; padding: 0 10px 20px 10px; scroll-snap-type: x mandatory; scroll-behavior: smooth; box-sizing: border-box; }
         .category-col { flex: 0 0 calc(16.666% - 1.25rem); min-width: 260px; display: flex; flex-direction: column; gap: 1rem; scroll-snap-align: start; }
         .cat-header { font-size: 1.3rem; font-weight: 700; color: white; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 0.5rem; margin-bottom: 0.5rem; text-shadow: 0 0 10px rgba(255,255,255,0.2); position: relative; }
         .cat-header::after { content: ''; position: absolute; bottom: -2px; left: 0; width: 40px; height: 2px; background: var(--accent-cyan); box-shadow: 0 0 10px var(--accent-cyan); }
+
+        .swipe-hint {
+            position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 20px);
+            background: linear-gradient(90deg, rgba(5,5,8,0) 0%, rgba(5,5,8,0.85) 30%, rgba(5,5,8,0.85) 70%, rgba(5,5,8,0) 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10; color: white; opacity: 1; transition: opacity 0.5s ease, visibility 0.5s; pointer-events: none;
+            border-radius: 20px;
+        }
+        .swipe-hint.hidden { opacity: 0; visibility: hidden; }
+        .swipe-icon-wrapper { animation: swipeMove 2s infinite ease-in-out; display: flex; align-items: center; gap: 15px; color: var(--accent-cyan); filter: drop-shadow(0 0 10px var(--accent-cyan)); }
+        @keyframes swipeMove { 0% { transform: translateX(25px); opacity: 0; } 20% { opacity: 1; } 80% { opacity: 1; } 100% { transform: translateX(-25px); opacity: 0; } }
 
         @media (max-width: 1700px) { .category-col { flex: 0 0 calc(20% - 1.2rem); } }
         @media (max-width: 1400px) { .category-col { flex: 0 0 calc(25% - 1.125rem); } }
         @media (max-width: 1100px) { .category-col { flex: 0 0 calc(33.333% - 1rem); } }
         @media (max-width: 850px) { .category-col { flex: 0 0 calc(50% - 0.75rem); } }
         @media (max-width: 550px) { .category-col { flex: 0 0 100%; min-width: 100%; } .categories-wrapper { gap: 1rem; padding-right: 0; } }
+        @media (min-width: 851px) { .swipe-hint { display: none !important; } } /* Auf großen Screens nie anzeigen */
 
         /* Footer */
         .footer { position: fixed; bottom: 0; left: 0; width: 100%; padding: 10px 20px; display: flex; justify-content: space-between; box-sizing: border-box; pointer-events: none; z-index: 50; }
@@ -184,11 +227,8 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; opacity: 0; visibility: hidden; transition: 0.3s ease; padding: 1rem; box-sizing: border-box; }
         .modal-overlay.active { opacity: 1; visibility: visible; }
         .modal-box { 
-            background: rgba(255, 255, 255, 0.02); 
-            backdrop-filter: blur(24px) saturate(200%); -webkit-backdrop-filter: blur(24px) saturate(200%);
-            border: 1px solid rgba(255, 255, 255, 0.08); 
-            border-top: 1px solid rgba(255, 255, 255, 0.2); 
-            border-left: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(24px) saturate(200%); -webkit-backdrop-filter: blur(24px) saturate(200%);
+            border: 1px solid rgba(255, 255, 255, 0.08); border-top: 1px solid rgba(255, 255, 255, 0.2); border-left: 1px solid rgba(255, 255, 255, 0.2);
             border-radius: 24px; padding: 2.5rem; width: 100%; max-width: 450px; 
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
             transform: translateY(20px) scale(0.95); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-align: center; position: relative; max-height: 90vh; overflow-y: auto;
@@ -201,23 +241,21 @@
         .modal-text { font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; color: var(--text-main); }
         
         /* Modal Inputs - Inset Glass */
+        .input-wrapper { position: relative; width: 100%; margin-bottom: 1rem; }
         .modal-input { 
-            width: 100%; padding: 14px 16px; margin-bottom: 1rem; border-radius: 12px; color: white; font-size: 1.1rem; font-family: 'Quicksand', sans-serif; outline: none; box-sizing: border-box; transition: 0.3s;
-            background: rgba(0, 0, 0, 0.25); 
-            border: 1px solid rgba(255, 255, 255, 0.1); 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
+            width: 100%; padding: 14px 45px 14px 16px; border-radius: 12px; color: white; font-size: 1.1rem; font-family: 'Quicksand', sans-serif; outline: none; box-sizing: border-box; transition: 0.3s;
+            background: rgba(0, 0, 0, 0.25); border: 1px solid rgba(255, 255, 255, 0.1); border-bottom: 1px solid rgba(255, 255, 255, 0.2); box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);
         }
         .modal-input:focus { background: rgba(0, 0, 0, 0.4); border-color: var(--accent-purple); box-shadow: 0 0 15px rgba(189,0,255,0.3), inset 0 2px 5px rgba(0,0,0,0.3); }
+        .eye-icon { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; padding: 5px; }
+        .eye-icon:hover { color: var(--accent-cyan); }
         
         .modal-actions { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
-        .modal-actions.right { justify-content: flex-end; }
         
         /* Modal Buttons - Glass */
         .modal-btn { 
             padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 1.05rem; font-family: 'Quicksand', sans-serif; font-weight: 700; transition: 0.2s; flex: 1; min-width: 120px;
-            background: rgba(255, 255, 255, 0.05); 
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1); border-top: 1px solid rgba(255, 255, 255, 0.2);
             color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
@@ -227,14 +265,6 @@
         .modal-btn.danger { background: rgba(255, 0, 85, 0.15); color: #ffffff; border-color: var(--danger); }
         .modal-btn.danger:hover { background: rgba(255, 0, 85, 0.3); box-shadow: 0 0 25px rgba(255,0,85,0.5); }
 
-        /* Editor Liste - Glass Items */
-        .editor-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1.5rem; }
-        .editor-item { display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 1.2rem; border-radius: 14px; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
-        .editor-item span { font-weight: 600; font-size: 1rem; word-break: break-all; margin-right: 10px;}
-        .editor-actions { display: flex; gap: 0.5rem; flex-shrink: 0;}
-        .icon-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); cursor: pointer; padding: 6px; border-radius: 8px; transition: 0.2s; backdrop-filter: blur(5px); }
-        .icon-btn:hover { background: rgba(255,255,255,0.2); }
-        
         /* Toast - Glass */
         .toast { position: fixed; top: -100px; left: 50%; transform: translateX(-50%); padding: 12px 24px; border-radius: 30px; font-weight: 700; transition: top 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); z-index: 2000; white-space: nowrap; 
             background: rgba(20, 15, 30, 0.5); backdrop-filter: blur(15px) saturate(200%); -webkit-backdrop-filter: blur(15px) saturate(200%);
@@ -268,7 +298,27 @@
 <body>
     <div id="toast" class="toast"></div>
 
-    <!-- LOCK SCREEN OVERLAY -->
+    <!-- STROBE FLASH OVERLAY -->
+    <div id="flash-overlay"></div>
+
+    <!-- GLOBAL SECURITY LOCK SCREEN -->
+    <div id="global-lock-overlay">
+        <div class="global-lock-icon">
+            <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+        </div>
+        <div class="lock-title" style="color:var(--danger)">Sicherheitssperre</div>
+        <div class="lock-text">Aufgrund zu vieler Fehlversuche wurde der Zugriff blockiert.<br>Bitte wende dich an einen Administrator.</div>
+        
+        <div id="auth-pin-container">
+            <div style="font-weight:700; color:white; margin-bottom:10px;">AuthPIN Scanner</div>
+            <div class="auth-pin-number" id="auth-pin-display">------</div>
+            <div id="qrcode"></div>
+            <div class="auth-scanning-text">Warte auf Verifizierung durch Server...</div>
+            <button class="modal-btn" style="margin-top:1rem;" onclick="closeAuthPin()">Abbrechen</button>
+        </div>
+    </div>
+
+    <!-- REGULAR LOCK SCREEN OVERLAY (Disable) -->
     <div id="lock-overlay">
         <div class="lock-icon">
             <svg viewBox="0 0 24 24" width="80" height="80" fill="none" stroke="var(--danger)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
@@ -361,8 +411,24 @@
 
         <hr class="fancy-divider">
 
-        <!-- DYNAMISCHE KATEGORIEN -->
-        <div id="categories-wrapper" class="categories-wrapper"></div>
+        <!-- DYNAMISCHE KATEGORIEN MIT MOBILE WIPE-ANIMATION -->
+        <div class="categories-scroll-container">
+            <div id="swipe-hint" class="swipe-hint hidden">
+                <div class="swipe-icon-wrapper">
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path>
+                    </svg>
+                    <svg viewBox="0 0 24 24" width="45" height="45" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 11V4a2 2 0 0 1 4 0v7M13 11V6a2 2 0 0 1 4 0v5M17 11v-1a2 2 0 0 1 4 0v6c0 3-2.5 5-5.5 5h-3c-3 0-6-3-6-6V9a2 2 0 0 1 4 0v2"></path>
+                    </svg>
+                    <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"></path><path d="M12 5l7 7-7 7"></path>
+                    </svg>
+                </div>
+                <div style="font-weight: 700; margin-top: 15px; letter-spacing: 1px; text-transform: uppercase; font-size: 0.95rem; color: var(--accent-cyan);">Wischen zum Entdecken</div>
+            </div>
+            <div id="categories-wrapper" class="categories-wrapper"></div>
+        </div>
     </div>
 
     <!-- Universal Modals - Glass Box -->
@@ -393,12 +459,13 @@
 
     <script>
         // === KONFIGURATION ===
-        const CONFIG_VERSION = "V1.5 - Glass Update";
+        const CONFIG_VERSION = "V1.7 - Mobile & Security";
         const CONFIG_SERVER_INFO = "Server Status: Online";
         const CONFIG_CHANGELOG = "ON"; // ON oder OFF
         const GIST_LINKS = "https://gist.githubusercontent.com/Kleinlauch/10a4297a3eea8e907ca7ca7996a7ceab/raw";
         const GIST_USERS = "https://gist.githubusercontent.com/Kleinlauch/6ccb29c799b9a8ef77998a16fec5dfbf/raw";
         const GIST_CHANGELOG = "https://gist.githubusercontent.com/Kleinlauch/2dc67de9d874d23625ad8f4567f1055f/raw";
+        const GIST_AUTH_PIN = "https://gist.githubusercontent.com/Kleinlauch/fe02f20bb38d6e635c8737062c2385ab/raw";
         const PUSHCUT_BASE = "https://api.pushcut.io/loPBXSU7lmRjUzDvwnMUm/execute?shortcut=";
         // =====================
 
@@ -410,9 +477,96 @@
         let rawLine0 = 'enable', rawLine1 = '[!]'; // Default Gist Lines
         let lastGistText = "";
 
+        // --- SICHERHEITS SYSTEM (5 Fehlversuche & Flash) ---
+        let failCount = parseInt(localStorage.getItem('9c_fail_count') || '0');
+        let isGlobalLocked = localStorage.getItem('9c_locked') === 'true';
+        let currentAuthPin = ""; let authPinInterval = null;
+        let clickCount = 0; let clickTimer = null; let touchCount = 0;
+
+        function checkSecurityState() {
+            if(isGlobalLocked) document.getElementById('global-lock-overlay').classList.add('active');
+            else document.getElementById('global-lock-overlay').classList.remove('active');
+        }
+
+        function triggerFlashAndLock() {
+            const flash = document.getElementById('flash-overlay');
+            flash.classList.add('flash-active');
+            // Zeige Lock Screen nachdem der Blitz-Effekt fast durch ist (0.8s Animation)
+            setTimeout(() => {
+                checkSecurityState(); 
+                showToast("Sicherheits-Sperre aktiv.");
+                flash.classList.remove('flash-active');
+            }, 750); 
+        }
+
+        function registerFail() {
+            failCount++; localStorage.setItem('9c_fail_count', failCount);
+            if(failCount >= 5) {
+                isGlobalLocked = true; localStorage.setItem('9c_locked', 'true');
+                triggerFlashAndLock();
+            } else {
+                showToast("Fehlversuch: " + failCount + "/5");
+            }
+        }
+        function resetFails() { failCount = 0; localStorage.setItem('9c_fail_count', 0); }
+        
+        function unlockSystem() {
+            isGlobalLocked = false; localStorage.setItem('9c_locked', 'false'); resetFails();
+            closeAuthPin(); checkSecurityState(); showToast("System erfolgreich entsperrt!");
+        }
+
+        // 5-Klick Erkennung (Maus)
+        document.addEventListener('click', (e) => {
+            if(!isGlobalLocked) return;
+            clickCount++; clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => { clickCount = 0; }, 1000); // 5x innerhalb 1 Sekunde
+            if(clickCount >= 5) { clickCount = 0; triggerAuthPin(); }
+        });
+
+        // 5-Finger Touch Erkennung
+        document.addEventListener('touchstart', (e) => {
+            if(!isGlobalLocked) return;
+            if(e.touches.length >= 5) {
+                touchCount++;
+                if(touchCount === 1) { // 3 Sekunden halten
+                    setTimeout(() => { if(document.querySelectorAll(':active').length >= 5 || e.touches.length >= 5) triggerAuthPin(); }, 3000);
+                }
+            }
+        });
+        document.addEventListener('touchend', () => { touchCount = 0; });
+
+        function triggerAuthPin() {
+            if(document.getElementById('auth-pin-container').classList.contains('active')) return;
+            currentAuthPin = Math.floor(100000 + Math.random() * 900000).toString(); // 6-stelliger PIN
+            document.getElementById('auth-pin-display').textContent = currentAuthPin;
+            document.getElementById('auth-pin-container').classList.add('active');
+            
+            // Generate QR Code
+            document.getElementById('qrcode').innerHTML = "";
+            new QRCode(document.getElementById('qrcode'), { text: currentAuthPin, width: 150, height: 150, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.H });
+
+            // Start Polling Gist
+            if(authPinInterval) clearInterval(authPinInterval);
+            authPinInterval = setInterval(checkAuthPinGist, 3000);
+        }
+
+        function closeAuthPin() {
+            document.getElementById('auth-pin-container').classList.remove('active');
+            if(authPinInterval) clearInterval(authPinInterval);
+        }
+
+        async function checkAuthPinGist() {
+            try {
+                const res = await fetch(GIST_AUTH_PIN + "?t=" + Date.now());
+                const pinInGist = (await res.text()).trim();
+                if(pinInGist === currentAuthPin) { unlockSystem(); }
+            } catch(e) {}
+        }
+
         // --- OSK ---
         let shiftActive = false;
         document.addEventListener('contextmenu', e => {
+            if(isGlobalLocked) { e.preventDefault(); return; }
             if (e.target.tagName === 'INPUT' && window.innerWidth > window.innerHeight) { e.preventDefault(); activeInput = e.target; document.getElementById('osk').classList.add('active'); }
             else e.preventDefault();
         });
@@ -424,11 +578,7 @@
             activeInput.focus();
         }
         function oskEnter() { document.getElementById('osk').classList.remove('active'); if(activeInput) activeInput.dispatchEvent(new KeyboardEvent('keypress', {key: 'Enter'})); }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
+        function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); }
 
         // --- HILFSFUNKTIONEN ---
         async function sha512(s) { const b = await crypto.subtle.digest("SHA-512", new TextEncoder().encode(s)); return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
@@ -437,59 +587,35 @@
         const deleteCookie = n => document.cookie = `${n}=; max-age=0; path=/`;
         const sanitizeGist = s => s.replace(/[&<>'"]/g, t => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[t])).replace(/[;~\n\r]/g, ' ').trim();
 
-        // --- TAB-TITEL ENGINE (Fix für Echtzeit und Inaktivität) ---
+        // --- TAB-TITEL ENGINE ---
         let tabMode = 'intro'; let tabStep = 0; let lastBlink = 0;
-        const introText = ["{ Willkommen }", "{ Guten Tag }", "Loading..."];
-        const days = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
+        const introText = ["{ Willkommen }", "{ Guten Tag }", "Loading..."]; const days = ["So.", "Mo.", "Di.", "Mi.", "Do.", "Fr.", "Sa."];
         
         function getSchoolSlot(date) {
             const h = date.getHours(), m = date.getMinutes(), d = date.getDay(), min = h * 60 + m;
-            const klingelZeiten = [460, 505, 550, 570, 615, 620, 665, 680, 725, 730, 775]; 
-            const mitKlingel = [775, 835, 930]; 
-            if(klingelZeiten.includes(min) || ((d===1||d===2||d===4) && mitKlingel.includes(min))) {
-                if(Date.now() - lastBlink > 60000) { lastBlink = Date.now(); return 'BLINK'; }
-            }
-            if(min < 460) return 'WAIT'; 
-            if(min < 505) return '1'; if(min < 550) return '2'; if(min < 570) return 'P1';
-            if(min < 615) return '3'; if(min < 620) return 'BRK1'; 
-            if(min < 665) return '4'; if(min < 680) return 'P2';
-            if(min < 725) return '5'; if(min < 730) return 'BRK2'; 
-            if(min < 775) return '6'; 
-            if(d === 1 || d === 2 || d === 4) { if(min < 835) return 'MP'; if(min < 930) return 'MS'; }
-            return 'DONE'; 
+            const klingelZeiten = [460, 505, 550, 570, 615, 620, 665, 680, 725, 730, 775]; const mitKlingel = [775, 835, 930]; 
+            if(klingelZeiten.includes(min) || ((d===1||d===2||d===4) && mitKlingel.includes(min))) { if(Date.now() - lastBlink > 60000) { lastBlink = Date.now(); return 'BLINK'; } }
+            if(min < 460) return 'WAIT'; if(min < 505) return '1'; if(min < 550) return '2'; if(min < 570) return 'P1';
+            if(min < 615) return '3'; if(min < 620) return 'BRK1'; if(min < 665) return '4'; if(min < 680) return 'P2';
+            if(min < 725) return '5'; if(min < 730) return 'BRK2'; if(min < 775) return '6'; 
+            if(d === 1 || d === 2 || d === 4) { if(min < 835) return 'MP'; if(min < 930) return 'MS'; } return 'DONE'; 
         }
 
         function updateTabTitle() {
-            if(tabMode === 'intro') {
-                document.title = introText[tabStep]; tabStep++;
-                if(tabStep >= introText.length) { tabMode = 'run'; tabStep = 0; }
-                return;
-            }
-
+            if(tabMode === 'intro') { document.title = introText[tabStep]; tabStep++; if(tabStep >= introText.length) { tabMode = 'run'; tabStep = 0; } return; }
             const now = new Date(); const slot = getSchoolSlot(now);
-            
             if(slot === 'BLINK') { document.title = "--- KLINGELN ---"; return; }
             if(slot === 'WAIT') { document.title = tabStep % 2 === 0 ? "9C | Schulbeginn ausstehend" : "Was machst du hier???"; tabStep++; return; }
             if(slot === 'DONE' || now.getDay() === 0 || now.getDay() === 6) { document.title = "Was machst du hier?"; return; }
-            
             if(slot.startsWith('BRK')) {
-                let endMin = slot === 'BRK1' ? 620 : 730;
-                let msLeft = (endMin * 60000) - ((now.getHours()*60 + now.getMinutes())*60000 + now.getSeconds()*1000);
-                let m = Math.floor(msLeft / 60000).toString().padStart(2,'0');
-                let s = Math.floor((msLeft % 60000)/1000).toString().padStart(2,'0');
+                let endMin = slot === 'BRK1' ? 620 : 730; let msLeft = (endMin * 60000) - ((now.getHours()*60 + now.getMinutes())*60000 + now.getSeconds()*1000);
+                let m = Math.floor(msLeft / 60000).toString().padStart(2,'0'); let s = Math.floor((msLeft % 60000)/1000).toString().padStart(2,'0');
                 document.title = `9C | BRK | ${m}:${s}`; return;
             }
-
             const dateStr = `${days[now.getDay()]} ${now.getDate()}.${now.getMonth()+1}.`;
-            const texts = [
-                `9C | ${slot} | ${dateStr}`, 
-                () => { const n = new Date(); return `9C | ${slot} | ${[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>x.toString().padStart(2,'0')).join(':')}`; }
-            ];
+            const texts = [ `9C | ${slot} | ${dateStr}`, () => { const n = new Date(); return `9C | ${slot} | ${[n.getHours(),n.getMinutes(),n.getSeconds()].map(x=>x.toString().padStart(2,'0')).join(':')}`; } ];
             if(['MP','MS'].includes(slot)) texts.push(`9C | ${slot} | Mittagsschule`);
-
-            let currentItem = texts[tabStep % texts.length];
-            document.title = typeof currentItem === 'function' ? currentItem() : currentItem;
-            tabStep++;
+            let currentItem = texts[tabStep % texts.length]; document.title = typeof currentItem === 'function' ? currentItem() : currentItem; tabStep++;
         }
         
         setInterval(updateTabTitle, 2000);
@@ -514,7 +640,7 @@
         }
         setInterval(updateClock, 1000); updateClock();
 
-        // --- Custom Dialog ---
+        // --- Custom Dialog (Mit Auge für Passwort) ---
         const Dialog = {
             overlay: document.getElementById('dialog-overlay'), box: document.getElementById('dialog-box'),
             title: document.getElementById('dialog-title'), text: document.getElementById('dialog-text'),
@@ -529,17 +655,20 @@
                     if (cfg.fields) {
                         cfg.fields.forEach((f, i) => {
                             if(f.label) { let l = document.createElement('label'); l.textContent = f.label; l.style.color="var(--text-muted)"; l.style.display="block"; l.style.marginBottom="5px"; l.style.textAlign="left"; this.inputs.appendChild(l); }
+                            let wrap = document.createElement('div'); wrap.className = 'input-wrapper';
                             let inp = document.createElement('input'); inp.type = f.type || 'text'; inp.className = 'modal-input'; inp.placeholder = f.placeholder || ''; inp.value = f.value || '';
                             inp.addEventListener('keypress', (e) => { if(e.key === 'Enter') { e.preventDefault(); this.submit(cfg.buttons); } });
-                            this.inputs.appendChild(inp); if (i === 0) setTimeout(() => inp.focus(), 50);
+                            wrap.appendChild(inp);
+                            if(f.type === 'password') {
+                                let eye = document.createElement('div'); eye.className = 'eye-icon';
+                                eye.innerHTML = `<svg viewBox="0 0 24 24" width="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+                                eye.onclick = () => { inp.type = inp.type === 'password' ? 'text' : 'password'; eye.style.color = inp.type === 'text' ? 'var(--accent-cyan)' : 'var(--text-muted)'; };
+                                wrap.appendChild(eye);
+                            }
+                            this.inputs.appendChild(wrap); if (i === 0) setTimeout(() => inp.focus(), 50);
                         });
                     } else if(cfg.customHTML) this.inputs.innerHTML = cfg.customHTML;
-                    if (cfg.buttons) {
-                        cfg.buttons.forEach(b => {
-                            let btn = document.createElement('button'); btn.className = 'modal-btn ' + (b.class||''); btn.textContent = b.text;
-                            btn.onclick = () => this.handleBtnClick(b.action); this.actions.appendChild(btn);
-                        });
-                    }
+                    if (cfg.buttons) { cfg.buttons.forEach(b => { let btn = document.createElement('button'); btn.className = 'modal-btn ' + (b.class||''); btn.textContent = b.text; btn.onclick = () => this.handleBtnClick(b.action); this.actions.appendChild(btn); }); }
                     this.overlay.classList.add('active');
                 });
             },
@@ -554,36 +683,22 @@
 
         // --- SCHNELLZUGRIFF ---
         function showNCInfo() { Dialog.open({ title: 'Next Cloud Info', showClose: true, text: 'Auf dieser Seite meldest du dich mit deinen Zugangsdaten an. Danach kannst du auf deine Dateien zugreifen.', buttons: [{text: 'Weiter zu Next Cloud', class: 'primary', action: () => { Dialog.close(); window.open('https://nc.schillerschuledettingen.de/nextcloud/login', '_blank'); }}] }); }
-        
         function getOSInstructions() {
             let ua = navigator.userAgent;
             if (/iPad|iPhone|iPod/.test(ua)) return "Textfeld gedrückt halten oder doppeltippen, dann auf <b>Einsetzen</b> tippen.";
             if (/Android/.test(ua)) return "Textfeld gedrückt halten und auf <b>Einfügen</b> tippen.";
-            if (/Mac/.test(ua)) return "<b>CMD + V</b> drücken oder Rechtsklick -> <b>Einsetzen</b> wählen.";
-            return "<b>STRG + V</b> drücken oder Rechtsklick -> <b>Einfügen</b> wählen.";
+            if (/Mac/.test(ua)) return "<b>CMD + V</b> drücken oder Rechtsklick -> <b>Einsetzen</b> wählen."; return "<b>STRG + V</b> drücken oder Rechtsklick -> <b>Einfügen</b> wählen.";
         }
-
         function showTaskcardsPopup() {
             Dialog.open({
-                title: 'Weiterleitung zu Taskcards', showClose: true,
-                text: `Im Passwort Feld musst du nur folgendes tun:<br><br><span style="color:var(--accent-cyan)">${getOSInstructions()}</span>`,
-                buttons: [{text: 'Weiter zu Taskcards', class: 'primary', action: () => {
-                    navigator.clipboard.writeText("9cEnglish2627").then(()=>{ Dialog.close(); window.open('https://www.taskcards.de/#/board/10eca93a-de74-456c-beaa-3841592ff1eb/view?token=75a6af1a-571e-47e7-bbc1-f26c6f9397c0', '_blank'); }).catch(()=>{alert("Fehler beim Kopieren.");});
-                }}]
+                title: 'Weiterleitung zu Taskcards', showClose: true, text: `Im Passwort Feld musst du nur folgendes tun:<br><br><span style="color:var(--accent-cyan)">${getOSInstructions()}</span>`,
+                buttons: [{text: 'Weiter zu Taskcards', class: 'primary', action: () => { navigator.clipboard.writeText("9cEnglish2627").then(()=>{ Dialog.close(); window.open('https://www.taskcards.de/#/board/10eca93a-de74-456c-beaa-3841592ff1eb/view?token=75a6af1a-571e-47e7-bbc1-f26c6f9397c0', '_blank'); }).catch(()=>{alert("Fehler beim Kopieren.");}); }}]
             });
         }
-
         function showTeacherPopup() {
             Dialog.open({
-                title: 'Hallo Frau Stephan!', showClose: false,
-                text: 'Bitte klicken Sie auf den Button, um das Passwort sicher zu kopieren und Taskcards zu öffnen.',
-                buttons: [{
-                    text: 'Passwort kopieren & Weiter', class: 'primary', action: () => {
-                        navigator.clipboard.writeText("9cEnglish2627").then(() => {
-                            window.location.href = 'https://www.taskcards.de/#/board/10eca93a-de74-456c-beaa-3841592ff1eb/view?token=75a6af1a-571e-47e7-bbc1-f26c6f9397c0';
-                        }).catch(() => alert("Fehler beim Kopieren."));
-                    }
-                }]
+                title: 'Hallo Frau Stephan!', showClose: false, text: 'Bitte klicken Sie auf den Button, um das Passwort sicher zu kopieren und Taskcards zu öffnen.',
+                buttons: [{ text: 'Passwort kopieren & Weiter', class: 'primary', action: () => { navigator.clipboard.writeText("9cEnglish2627").then(() => { window.location.href = 'https://www.taskcards.de/#/board/10eca93a-de74-456c-beaa-3841592ff1eb/view?token=75a6af1a-571e-47e7-bbc1-f26c6f9397c0'; }).catch(() => alert("Fehler beim Kopieren.")); } }]
             });
         }
 
@@ -595,21 +710,12 @@
                 const res = await fetch(GIST_CHANGELOG + "?t=" + Date.now());
                 if(res.ok) changelogText = await res.text();
                 document.getElementById('cl-bubble-text').textContent = changelogText;
-                
-                if(window.innerWidth > 768 && window.location.search === '') {
-                    setTimeout(() => {
-                        const b = document.getElementById('cl-bubble'); b.classList.add('show');
-                        startBubbleTimer();
-                    }, 1000);
-                }
+                if(window.innerWidth > 768 && window.location.search === '') { setTimeout(() => { const b = document.getElementById('cl-bubble'); b.classList.add('show'); startBubbleTimer(); }, 1000); }
             } catch(e) {}
         }
         function startBubbleTimer() { clearTimeout(bubbleTimer); bubbleTimer = setTimeout(closeBubble, 5000); }
         function clearBubbleTimer() { clearTimeout(bubbleTimer); }
-        function closeBubble() {
-            const b = document.getElementById('cl-bubble');
-            if(b.classList.contains('show')) { b.classList.add('fade-out'); setTimeout(() => { b.classList.remove('show'); b.classList.remove('fade-out'); }, 800); }
-        }
+        function closeBubble() { const b = document.getElementById('cl-bubble'); if(b.classList.contains('show')) { b.classList.add('fade-out'); setTimeout(() => { b.classList.remove('show'); b.classList.remove('fade-out'); }, 800); } }
         function showChangelog() {
             if(window.innerWidth <= 768) { Dialog.open({title: 'Das ist Neu', showClose: true, text: `<div style="text-align:left; white-space:pre-wrap; font-size:0.9rem;">${changelogText}</div>`, buttons: []}); }
             else { clearBubbleTimer(); document.getElementById('cl-bubble').classList.add('show'); document.getElementById('cl-bubble').classList.remove('fade-out'); }
@@ -617,19 +723,23 @@
 
         // --- INIT & POLLING ---
         window.onload = () => {
+            checkSecurityState(); // Check if locked on load
+
             const up = new URLSearchParams(window.location.search);
-            if (up.has('user') && up.has('password')) {
-                currentUser = up.get('user').toUpperCase(); setCookie('9c_user', currentUser, 7); showToast(`Angemeldet als: ${currentUser}`);
-                window.history.replaceState({}, document.title, window.location.pathname); updateMenu();
-            } else if (window.location.search.includes('st-tc')) { showTeacherPopup(); } 
-            else { const cUser = getCookie('9c_user'); if(cUser) { currentUser = cUser; updateMenu(); } }
+            if(!isGlobalLocked) {
+                if (up.has('user') && up.has('password')) {
+                    currentUser = up.get('user').toUpperCase(); setCookie('9c_user', currentUser, 7); showToast(`Angemeldet als: ${currentUser}`); resetFails();
+                    window.history.replaceState({}, document.title, window.location.pathname); updateMenu();
+                } else if (window.location.search.includes('st-tc')) { showTeacherPopup(); } 
+                else { const cUser = getCookie('9c_user'); if(cUser) { currentUser = cUser; updateMenu(); resetFails();} }
+            }
             
-            pollGist(); setInterval(pollGist, 8000);
-            loadChangelog();
+            pollGist(); setInterval(pollGist, 8000); loadChangelog();
         };
 
         // --- AUTH & MENÜ ---
         document.getElementById('btn-user').onclick = async () => {
+            if(isGlobalLocked) return;
             if (currentUser) {
                 if(currentUser === 'LOCAL') { Dialog.open({ title:'Hinweis', text:'Local-Passwort unveränderlich.', buttons:[{text:'OK',class:'primary',action:'cancel'}]}); return; }
                 const c = await Dialog.open({ title:'Passwort ändern?', buttons:[{text:'Abbrechen',action:'cancel'}, {text:'Ja',class:'primary',action:'ok'}]});
@@ -644,10 +754,14 @@
                 try {
                     const txt = await(await fetch(GIST_USERS+"?t="+Date.now())).text(); let h = null;
                     txt.split('\n').forEach(l=>{ let p=l.split(';'); if(p[0]===un) h=p[1]?.trim()||null; });
-                    if(h===null) Dialog.open({title:'Fehler', text:'User nicht gefunden', buttons:[{text:'OK',class:'danger',action:'cancel'}]});
+                    
+                    if(h===null) {
+                        Dialog.open({title:'Fehler', text:'Benutzer nicht gefunden.', buttons:[{text:'OK',class:'danger',action:'cancel'}]});
+                        registerFail(); // User does not exist = Fail
+                    }
                     else if(h==='-') {
                         const np = await Dialog.open({title:'Account neu', text:'Passwort festlegen:', fields:[{type:'password',placeholder:'Neu'}], buttons:[{text:'Abbruch',action:'cancel'},{text:'Festlegen',class:'primary',action:'ok'}]});
-                        if(np) triggerServerSync("9C-EDIT-REGISTER", `${un}%3B${await sha512(np)}`, () => { currentUser=un; setCookie('9c_user',un,7); updateMenu(); showToast('Angemeldet'); });
+                        if(np) triggerServerSync("9C-EDIT-REGISTER", `${un}%3B${await sha512(np)}`, () => { currentUser=un; setCookie('9c_user',un,7); updateMenu(); showToast('Angemeldet'); resetFails(); });
                     } else checkPass(un, h);
                 } catch(e) { Dialog.open({title:'Fehler', text:'Gist Error', buttons:[{text:'OK',class:'danger',action:'cancel'}]}); }
             }
@@ -656,8 +770,8 @@
         async function checkPass(u, ch) {
             const p = await Dialog.open({title:'Anmelden', text:`Hallo ${u}!`, fields:[{type:'password',placeholder:'Passwort'}], buttons:[{text:'Abbruch',action:'cancel'},{text:'Anmelden',class:'primary',action:'ok'}]});
             if(!p) return;
-            if(await sha512(p) === ch) { currentUser=u; setCookie('9c_user',u,7); updateMenu(); showToast('Angemeldet!'); }
-            else Dialog.open({title:'Fehler', text:'Falsch', buttons:[{text:'OK',class:'danger',action:'cancel'}]});
+            if(await sha512(p) === ch) { currentUser=u; setCookie('9c_user',u,7); updateMenu(); showToast('Angemeldet!'); resetFails(); }
+            else { Dialog.open({title:'Fehler', text:'Falsches Passwort', buttons:[{text:'OK',class:'danger',action:'cancel'}]}); registerFail(); }
         }
 
         document.getElementById('btn-signout').onclick = () => { deleteCookie('9c_user'); currentUser=null; updateMenu(); showToast('Abgemeldet'); };
@@ -672,25 +786,17 @@
 
         async function triggerServerSync(shortcut, payload, cb) {
             document.getElementById('sync-overlay').classList.add('active');
-            try { await fetch(PUSHCUT_BASE + shortcut + "&input=" + payload, {mode:'no-cors'});
-                setTimeout(()=>{ document.getElementById('sync-overlay').classList.remove('active'); setTimeout(cb,400); }, 1500);
-            } catch(e) { document.getElementById('sync-overlay').classList.remove('active'); alert("Server Error"); }
+            try { await fetch(PUSHCUT_BASE + shortcut + "&input=" + payload, {mode:'no-cors'}); setTimeout(()=>{ document.getElementById('sync-overlay').classList.remove('active'); setTimeout(cb,400); }, 1500); } catch(e) { document.getElementById('sync-overlay').classList.remove('active'); alert("Server Error"); }
         }
 
         // --- GIST PARSING & KATEGORIEN ---
         async function pollGist() {
-            try {
-                const txt = await(await fetch(GIST_LINKS+"?t="+Date.now())).text();
-                if(txt !== lastGistText) { lastGistText = txt; parseGistData(txt); }
-            } catch(e){}
+            try { const txt = await(await fetch(GIST_LINKS+"?t="+Date.now())).text(); if(txt !== lastGistText) { lastGistText = txt; parseGistData(txt); } } catch(e){}
         }
 
         function parseGistData(txt) {
-            const lines = txt.split('\n');
-            if(lines.length < 2) return;
-            
-            rawLine0 = lines[0].trim();
-            rawLine1 = lines[1].trim();
+            const lines = txt.split('\n'); if(lines.length < 2) return;
+            rawLine0 = lines[0].trim(); rawLine1 = lines[1].trim();
 
             if(rawLine0.toLowerCase() === 'disable') document.getElementById('lock-overlay').classList.add('active');
             else document.getElementById('lock-overlay').classList.remove('active');
@@ -703,20 +809,14 @@
                 alertBox.style.display = 'block';
             } else { alertBox.style.display = 'none'; }
 
-            linksData = [];
-            let catMap = new Map();
-            let currentCat = "Allgemein";
+            linksData = []; let catMap = new Map(); let currentCat = "Allgemein";
 
             for(let i=2; i<lines.length; i++) {
-                let l = lines[i].trim();
-                if(!l) continue;
-                if(l.startsWith('#')) {
-                    currentCat = l.substring(1).trim();
-                    if(!catMap.has(currentCat)) catMap.set(currentCat, []);
-                    continue;
-                }
+                let l = lines[i].trim(); if(!l) continue;
+                if(l.startsWith('#')) { currentCat = l.substring(1).trim(); if(!catMap.has(currentCat)) catMap.set(currentCat, []); continue; }
                 
-                let p = l.split(';-;'); if(p.length < 2) continue;
+                let p = l.includes(';-;') ? l.split(';-;') : l.split(';'); if(p.length < 2) continue;
+                
                 let lbl=p[0].trim(), pwd='-', tFull='';
                 if(p.length===2) tFull=p[1].trim(); else {pwd=p[1].trim()||'-'; tFull=p.slice(2).join(';-;').trim();}
                 let tgt=tFull, pop=''; let s=tFull.indexOf(';'); if(s!==-1){tgt=tFull.substring(0,s); pop=tFull.substring(s+1);}
@@ -731,14 +831,10 @@
         }
 
         function renderCategoriesUI(catMap) {
-            const wrapper = document.getElementById('categories-wrapper');
-            wrapper.innerHTML = '';
-            
+            const wrapper = document.getElementById('categories-wrapper'); wrapper.innerHTML = '';
             catMap.forEach((buttons, catName) => {
                 const col = document.createElement('div'); col.className = 'category-col';
-                const header = document.createElement('div'); header.className = 'cat-header'; header.textContent = catName;
-                col.appendChild(header);
-                
+                const header = document.createElement('div'); header.className = 'cat-header'; header.textContent = catName; col.appendChild(header);
                 buttons.forEach(b => {
                     const btn = document.createElement('button'); btn.className = 'glass-btn'; btn.textContent = b.label;
                     if(b.target.toUpperCase() === 'X') btn.disabled = true;
@@ -747,13 +843,51 @@
                 });
                 wrapper.appendChild(col);
             });
+            initSwipeHint(); // Init Wisch-Animation nach dem Laden der Kategorien
         }
 
-        async function handleLinkClick(lbl, pwd, tgt, pop) {
-            if(pwd!=='-' && pwd!=='') {
-                const i = await Dialog.open({title:'Geschützt', showClose:true, text:`Passwort für ${lbl}:`, fields:[{type:'password',placeholder:'PW'}], buttons:[{text:'Abbruch',action:'cancel'},{text:'OK',class:'primary',action:'ok'}]});
-                if(!i)return; if(i!==pwd) { Dialog.open({title:'Fehler', showClose:true, text:'Falsch!', buttons:[{text:'OK',class:'danger',action:'cancel'}]}); return; }
+        function initSwipeHint() {
+            const wrapper = document.getElementById('categories-wrapper');
+            const hint = document.getElementById('swipe-hint');
+            if(!wrapper || !hint) return;
+            
+            const hideHint = () => { hint.classList.add('hidden'); };
+            wrapper.addEventListener('scroll', hideHint, { once: true });
+            wrapper.addEventListener('touchstart', hideHint, { once: true });
+            
+            // Nur anzeigen, wenn Inhalt überhaupt scrollbar ist (overflow) und Gerät schmal ist
+            if(wrapper.scrollWidth > wrapper.clientWidth && window.innerWidth <= 850) {
+                hint.classList.remove('hidden');
+            } else {
+                hint.classList.add('hidden');
             }
+        }
+
+        // --- BUTTON KLICK MIT PASSWORT-AUSWAHL ---
+        async function handleLinkClick(lbl, pwd, tgt, pop) {
+            if(isGlobalLocked) return;
+            
+            if(pwd !== '-' && pwd !== '') {
+                const proceed = await Dialog.open({
+                    title: 'Gesperrt', showClose: true, text: `Der Button "${lbl}" ist durch ein Passwort geschützt.`,
+                    buttons: [ {text: 'Abbrechen', action: 'cancel'}, {text: 'Weiter mit Passwort', class: 'primary', action: 'ok'} ]
+                });
+                if(!proceed) return;
+
+                const input = await Dialog.open({
+                    title: 'Passwort', showClose: true, text: `Bitte gib das Passwort für "${lbl}" ein:`,
+                    fields: [{type: 'password', placeholder: 'Passwort'}],
+                    buttons: [{text: 'Abbrechen', action: 'cancel'}, {text: 'Bestätigen', class: 'primary', action: 'ok'}]
+                });
+                if(!input) return;
+                
+                if(input !== pwd) { 
+                    Dialog.open({title: 'Fehler', showClose: true, text: 'Falsches Passwort!', buttons: [{text: 'OK', class: 'danger', action: 'cancel'}]}); 
+                    registerFail(); return; 
+                }
+                resetFails();
+            }
+
             if(tgt.toLowerCase().startsWith('http')) {
                 if(pop) { const ok = await Dialog.open({title:lbl, showClose:true, text:pop, buttons:[{text:'Abbruch',action:'cancel'},{text:'Weiter',class:'primary',action:'ok'}]}); if(ok) window.open(tgt,'_blank'); }
                 else window.open(tgt,'_blank');
@@ -762,6 +896,7 @@
 
         // --- EDITOR & QUICK ADD ---
         document.getElementById('btn-links-add').onclick = () => {
+            if(isGlobalLocked) return;
             Dialog.open({
                 title:'Neuer Button', showClose:true,
                 fields:[{label:'Label*',placeholder:'Name'},{label:'Passwort (- für keins)',value:'-'},{label:'Link*',placeholder:'https://...'},{label:'Hinweis (- für keins)',value:'-'}],
@@ -773,7 +908,7 @@
             });
         };
 
-        document.getElementById('btn-edit').onclick = () => { editorData = JSON.parse(JSON.stringify(linksData)); isDirty = false; renderEditor(); };
+        document.getElementById('btn-edit').onclick = () => { if(isGlobalLocked) return; editorData = JSON.parse(JSON.stringify(linksData)); isDirty = false; renderEditor(); };
         function renderEditor() {
             let h = '<div class="editor-list">';
             editorData.forEach((l, i) => {
@@ -812,8 +947,7 @@
         }
         function saveGist(dlg) {
             if(!isDirty){dlg.close();return;}
-            let grouped = {};
-            editorData.forEach(l => { if(!grouped[l.category]) grouped[l.category]=[]; grouped[l.category].push(l); });
+            let grouped = {}; editorData.forEach(l => { if(!grouped[l.category]) grouped[l.category]=[]; grouped[l.category].push(l); });
             
             let ls = [rawLine0, rawLine1];
             for(let cat in grouped) {
@@ -822,7 +956,6 @@
                     ls.push(l.password!=='-'&&l.password!=='' ? `${l.label};-;\${l.password};-;\${l.target}${l.popupText?';'+l.popupText:''}` : `${l.label};-;\${l.target}${l.popupText?';'+l.popupText:''}`);
                 });
             }
-            
             Dialog.close(); triggerServerSync("9C-EDIT-APPLY", encodeURIComponent(ls.join('\n')), ()=> { lastGistText = ""; pollGist(); });
         }
     </script>
